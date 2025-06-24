@@ -23,32 +23,34 @@ export default function HomePage() {
 
   return (
     <ScoringProvider>
-      <div className="min-h-screen bg-gray-50 p-2 sm:p-4">
+      <div className="min-h-screen bg-gray-50 p-2 sm:p-4 lg:p-6">
         <div className="max-w-7xl mx-auto">
-          <header ref={headerRef} className="mb-4 sm:mb-6">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center">
+          <header ref={headerRef} className="mb-4 sm:mb-6 lg:mb-8">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 text-center px-2">
               🎯 Système de Score de Tir à la Carabine
             </h1>
           </header>
 
           <div ref={tabsRef}>
             <Tabs defaultValue="players" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="players" className="text-sm sm:text-base">
-                  👥 Gestion des Tireurs
+              <TabsList className="grid w-full grid-cols-2 mb-4 sm:mb-6 h-12 sm:h-14">
+                <TabsTrigger value="players" className="text-xs sm:text-sm lg:text-base font-medium">
+                  <span className="hidden sm:inline">👥 Gestion des Tireurs</span>
+                  <span className="sm:hidden">👥 Tireurs</span>
                 </TabsTrigger>
-                <TabsTrigger value="ranking" className="text-sm sm:text-base">
-                  🏆 Classement Global
+                <TabsTrigger value="ranking" className="text-xs sm:text-sm lg:text-base font-medium">
+                  <span className="hidden sm:inline">🏆 Classement Global</span>
+                  <span className="sm:hidden">🏆 Classement</span>
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="players">
-                <div className="max-w-2xl mx-auto">
+              <TabsContent value="players" className="mt-0">
+                <div className="max-w-4xl mx-auto">
                   <PlayerManagement />
                 </div>
               </TabsContent>
 
-              <TabsContent value="ranking">
+              <TabsContent value="ranking" className="mt-0">
                 <GlobalRanking />
               </TabsContent>
             </Tabs>

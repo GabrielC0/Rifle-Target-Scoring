@@ -176,46 +176,61 @@ function ShootingPageContent() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-2 sm:p-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div ref={headerRef} className="flex items-center gap-4 mb-6">
+        <div ref={headerRef} className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
           <Button
             variant="outline"
             onClick={() => router.push("/")}
             size="sm"
-            className="transition-all duration-200 hover:scale-105"
+            className="transition-all duration-200 hover:scale-105 self-start"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Retour
+            <span className="hidden sm:inline">Retour</span>
+            <span className="sm:hidden">←</span>
           </Button>
           <div className="flex-1">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">🎯 Session de Tir - {player.name}</h1>
+            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">
+              <span className="hidden sm:inline">🎯 Session de Tir - {player.name}</span>
+              <span className="sm:hidden">🎯 {player.name}</span>
+            </h1>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {/* Score Entry Panel */}
-          <div ref={leftPanelRef} className="space-y-6">
+          <div ref={leftPanelRef} className="space-y-4 sm:space-y-6">
             {/* Player Info */}
             <Card className="transition-all duration-300 hover:shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="w-5 h-5 text-blue-500" />
-                  Informations du Tireur
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                  <Target className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
+                  <span className="hidden sm:inline">Informations du Tireur</span>
+                  <span className="sm:hidden">Infos</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="p-4 bg-blue-50 rounded-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium text-blue-900 text-lg">{player.name}</span>
-                    <Badge variant="secondary" className="bg-blue-100 text-blue-800 animate-pulse">
-                      Tir {player.currentShot + 1}/{player.totalShots}
+              <CardContent className="space-y-3 sm:space-y-4 pt-0">
+                <div className="p-3 sm:p-4 bg-blue-50 rounded-lg">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
+                    <span className="font-medium text-blue-900 text-base sm:text-lg truncate">{player.name}</span>
+                    <Badge
+                      variant="secondary"
+                      className="bg-blue-100 text-blue-800 animate-pulse self-start sm:self-center"
+                    >
+                      <span className="hidden sm:inline">
+                        Tir {player.currentShot + 1}/{player.totalShots}
+                      </span>
+                      <span className="sm:hidden">
+                        {player.currentShot + 1}/{player.totalShots}
+                      </span>
                     </Badge>
                   </div>
-                  <div className="text-sm text-blue-700 mb-3">
-                    Score Total: <span className="font-bold text-xl">{player.totalScore}</span>
+                  <div className="text-sm text-blue-700 mb-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                    <span>
+                      Score Total: <span className="font-bold text-lg sm:text-xl">{player.totalScore}</span>
+                    </span>
                     {player.scores.length > 0 && (
-                      <span className="ml-4">
+                      <span>
                         Moyenne:{" "}
                         <span className="font-bold">{(player.totalScore / player.scores.length).toFixed(1)}</span>
                       </span>
@@ -229,13 +244,14 @@ function ShootingPageContent() {
 
             {/* Score Entry */}
             <Card className="transition-all duration-300 hover:shadow-lg">
-              <CardHeader>
-                <CardTitle>Saisie du Score</CardTitle>
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="text-base sm:text-lg">Saisie du Score</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+
+              <CardContent className="space-y-3 sm:space-y-4 pt-0">
                 {canAddScore ? (
                   <>
-                    {/* Manual Score Entry */}
+                    {/* Saisie manuelle */}
                     <div className="space-y-2">
                       <div className="flex gap-2">
                         <Input
@@ -246,8 +262,8 @@ function ShootingPageContent() {
                           placeholder="Score (0-10)"
                           value={scoreInput}
                           onChange={(e) => setScoreInput(e.target.value)}
-                          onKeyPress={(e) => e.key === "Enter" && handleAddScore()}
-                          className="text-lg transition-all duration-200 focus:scale-[1.02]"
+                          onKeyDown={(e) => e.key === "Enter" && handleAddScore()}
+                          className="text-base sm:text-lg transition-all duration-200 focus:scale-[1.02]"
                           autoFocus
                           data-score-input
                         />
@@ -255,71 +271,86 @@ function ShootingPageContent() {
                           onClick={handleAddScore}
                           disabled={!scoreInput.trim()}
                           size="lg"
-                          className="transition-all duration-200 hover:scale-105"
+                          className="transition-all duration-200 hover:scale-105 px-4 sm:px-6"
                         >
-                          Valider
+                          <span className="hidden sm:inline">Valider</span>
+                          <span className="sm:hidden">✓</span>
                         </Button>
                       </div>
                     </div>
 
-                    {/* Quick Score Buttons */}
+                    {/* Boutons rapides */}
                     <div className="space-y-3">
-                      <div className="text-sm font-medium text-gray-700">Scores Rapides:</div>
-                      <div ref={scoreButtonsRef} className="grid grid-cols-4 sm:grid-cols-6 gap-2">
-                        {[10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map((score) => (
+                      <div className="text-sm font-medium text-gray-700">
+                        <span className="hidden sm:inline">Scores rapides :</span>
+                        <span className="sm:hidden">Rapides :</span>
+                      </div>
+
+                      <div ref={scoreButtonsRef} className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2">
+                        {[10, 9, 8, 7, 6, 5, 4, 3, 2, 1].map((s) => (
                           <Button
-                            key={score}
+                            key={s}
                             variant="outline"
                             size="lg"
-                            onClick={() => handleQuickScore(score)}
-                            data-quick-score={score}
-                            className={`h-12 text-lg font-bold transition-all duration-200 hover:scale-110 ${
-                              score >= 9
+                            onClick={() => handleQuickScore(s)}
+                            data-quick-score={s}
+                            className={`h-10 sm:h-12 text-sm sm:text-lg font-bold transition-all duration-200 hover:scale-110 ${
+                              s >= 9
                                 ? "border-green-500 text-green-700 hover:bg-green-50"
-                                : score >= 7
+                                : s >= 7
                                   ? "border-yellow-500 text-yellow-700 hover:bg-yellow-50"
                                   : "border-red-500 text-red-700 hover:bg-red-50"
                             }`}
                           >
-                            {score}
+                            {s}
                           </Button>
                         ))}
+
+                        {/* Bouton “Raté” */}
                         <Button
                           variant="outline"
                           size="lg"
                           onClick={() => handleQuickScore(0)}
                           data-quick-score={0}
-                          className="h-12 text-lg font-bold border-red-500 text-red-700 hover:bg-red-50 col-span-2 transition-all duration-200 hover:scale-110"
+                          className="h-10 sm:h-12 col-span-3 sm:col-span-2 lg:col-span-1 text-sm sm:text-lg font-bold border-red-500 text-red-700 hover:bg-red-50 transition-all duration-200 hover:scale-110"
                         >
-                          Raté
+                          <span className="hidden sm:inline">Raté</span>
+                          <span className="sm:hidden">×</span>
                         </Button>
                       </div>
                     </div>
                   </>
                 ) : (
-                  <div className="text-center py-8">
-                    <div className="text-green-600 text-xl font-bold mb-2 animate-bounce">🎉 Session Terminée !</div>
-                    <p className="text-gray-600 mb-4">Tous les tirs ont été effectués</p>
+                  /* Tous les tirs effectués */
+                  <div className="text-center py-6 sm:py-8">
+                    <div className="text-green-600 text-lg sm:text-xl font-bold mb-2 animate-bounce">
+                      🎉 Session terminée !
+                    </div>
+                    <p className="text-gray-600 mb-4 text-sm sm:text-base">Tous les tirs ont été effectués</p>
                     <Button
                       onClick={() => router.push(`/results/${player.id}`)}
                       size="lg"
                       className="transition-all duration-200 hover:scale-105"
                     >
-                      Voir les Résultats Détaillés
+                      <span className="hidden sm:inline">Voir les résultats détaillés</span>
+                      <span className="sm:hidden">Résultats</span>
                     </Button>
                   </div>
                 )}
 
-                {/* Recent Scores */}
+                {/* Scores récents */}
                 {player.scores.length > 0 && (
                   <div className="space-y-2">
-                    <div className="text-sm font-medium text-gray-700">Scores de cette session:</div>
-                    <div className="flex flex-wrap gap-2">
-                      {player.scores.map((score, index) => (
+                    <div className="text-sm font-medium text-gray-700">
+                      <span className="hidden sm:inline">Scores de cette session :</span>
+                      <span className="sm:hidden">Scores :</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1 sm:gap-2">
+                      {player.scores.map((score, idx) => (
                         <Badge
-                          key={index}
+                          key={idx}
                           variant="outline"
-                          className={`text-sm transition-all duration-200 hover:scale-110 ${
+                          className={`text-xs sm:text-sm transition-all duration-200 hover:scale-110 ${
                             score >= 9
                               ? "bg-green-100 text-green-800 border-green-300"
                               : score >= 7
@@ -327,7 +358,7 @@ function ShootingPageContent() {
                                 : "bg-red-100 text-red-800 border-red-300"
                           }`}
                         >
-                          #{index + 1}: {score}
+                          #{idx + 1}: {score}
                         </Badge>
                       ))}
                     </div>
@@ -338,32 +369,44 @@ function ShootingPageContent() {
           </div>
 
           {/* Live Chart */}
-          <div ref={rightPanelRef} className="space-y-6">
+          <div ref={rightPanelRef} className="space-y-4 sm:space-y-6">
             <Card className="transition-all duration-300 hover:shadow-lg">
-              <CardHeader>
-                <CardTitle>Évolution en Temps Réel</CardTitle>
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="text-base sm:text-lg">
+                  <span className="hidden sm:inline">Évolution en Temps Réel</span>
+                  <span className="sm:hidden">Évolution</span>
+                </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0">
                 {chartData.length > 0 ? (
-                  <div className="h-80">
+                  <div className="h-64 sm:h-80">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={chartData}>
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="shot" label={{ value: "N° Tir", position: "insideBottom", offset: -5 }} />
-                        <YAxis label={{ value: "Score", angle: -90, position: "insideLeft" }} domain={[0, 10]} />
+                        <XAxis
+                          dataKey="shot"
+                          label={{ value: "N° Tir", position: "insideBottom", offset: -5 }}
+                          tick={{ fontSize: 10 }}
+                        />
+                        <YAxis
+                          label={{ value: "Score", angle: -90, position: "insideLeft" }}
+                          domain={[0, 10]}
+                          tick={{ fontSize: 10 }}
+                        />
                         <Tooltip
                           formatter={(value, name) => [
                             value,
                             name === "score" ? "Score du Tir" : name === "cumulative" ? "Score Total" : "Moyenne",
                           ]}
                           labelFormatter={(label) => `Tir ${label}`}
+                          contentStyle={{ fontSize: "12px" }}
                         />
                         <Line
                           type="monotone"
                           dataKey="score"
                           stroke="#3b82f6"
-                          strokeWidth={3}
-                          dot={{ fill: "#3b82f6", strokeWidth: 2, r: 5 }}
+                          strokeWidth={2}
+                          dot={{ fill: "#3b82f6", strokeWidth: 2, r: 4 }}
                           name="score"
                         />
                         <Line
@@ -379,10 +422,13 @@ function ShootingPageContent() {
                     </ResponsiveContainer>
                   </div>
                 ) : (
-                  <div className="h-80 flex items-center justify-center text-gray-500">
+                  <div className="h-64 sm:h-80 flex items-center justify-center text-gray-500">
                     <div className="text-center">
-                      <Target className="w-16 h-16 mx-auto mb-4 text-gray-300 animate-pulse" />
-                      <p>Commencez à tirer pour voir l'évolution</p>
+                      <Target className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 text-gray-300 animate-pulse" />
+                      <p className="text-sm">
+                        <span className="hidden sm:inline">Commencez à tirer pour voir l'évolution</span>
+                        <span className="sm:hidden">Commencez à tirer</span>
+                      </p>
                     </div>
                   </div>
                 )}
@@ -392,27 +438,30 @@ function ShootingPageContent() {
             {/* Quick Stats */}
             {player.scores.length > 0 && (
               <Card className="transition-all duration-300 hover:shadow-lg">
-                <CardHeader>
-                  <CardTitle>Statistiques Actuelles</CardTitle>
+                <CardHeader className="pb-3 sm:pb-6">
+                  <CardTitle className="text-base sm:text-lg">
+                    <span className="hidden sm:inline">Statistiques Actuelles</span>
+                    <span className="sm:hidden">Stats</span>
+                  </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <div className="text-center p-3 bg-blue-50 rounded-lg transition-all duration-200 hover:scale-105">
-                      <div className="text-2xl font-bold text-blue-600">{player.totalScore}</div>
+                <CardContent className="pt-0">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
+                    <div className="text-center p-2 sm:p-3 bg-blue-50 rounded-lg transition-all duration-200 hover:scale-105">
+                      <div className="text-lg sm:text-2xl font-bold text-blue-600">{player.totalScore}</div>
                       <div className="text-xs text-gray-500">Total</div>
                     </div>
-                    <div className="text-center p-3 bg-green-50 rounded-lg transition-all duration-200 hover:scale-105">
-                      <div className="text-2xl font-bold text-green-600">
+                    <div className="text-center p-2 sm:p-3 bg-green-50 rounded-lg transition-all duration-200 hover:scale-105">
+                      <div className="text-lg sm:text-2xl font-bold text-green-600">
                         {(player.totalScore / player.scores.length).toFixed(1)}
                       </div>
                       <div className="text-xs text-gray-500">Moyenne</div>
                     </div>
-                    <div className="text-center p-3 bg-yellow-50 rounded-lg transition-all duration-200 hover:scale-105">
-                      <div className="text-2xl font-bold text-yellow-600">{Math.max(...player.scores)}</div>
+                    <div className="text-center p-2 sm:p-3 bg-yellow-50 rounded-lg transition-all duration-200 hover:scale-105">
+                      <div className="text-lg sm:text-2xl font-bold text-yellow-600">{Math.max(...player.scores)}</div>
                       <div className="text-xs text-gray-500">Meilleur</div>
                     </div>
-                    <div className="text-center p-3 bg-red-50 rounded-lg transition-all duration-200 hover:scale-105">
-                      <div className="text-2xl font-bold text-red-600">{Math.min(...player.scores)}</div>
+                    <div className="text-center p-2 sm:p-3 bg-red-50 rounded-lg transition-all duration-200 hover:scale-105">
+                      <div className="text-lg sm:text-2xl font-bold text-red-600">{Math.min(...player.scores)}</div>
                       <div className="text-xs text-gray-500">Plus Faible</div>
                     </div>
                   </div>

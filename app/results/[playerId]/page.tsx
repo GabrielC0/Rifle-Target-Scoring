@@ -115,84 +115,103 @@ function ResultsPageContent() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-2 sm:p-4">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div ref={headerRef} className="flex items-center gap-4 mb-6">
+        <div ref={headerRef} className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
           <Button
             variant="outline"
             onClick={() => router.push("/")}
             size="sm"
-            className="transition-all duration-200 hover:scale-105"
+            className="transition-all duration-200 hover:scale-105 self-start"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Retour
+            <span className="hidden sm:inline">Retour</span>
+            <span className="sm:hidden">←</span>
           </Button>
           <div className="flex-1">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">📊 Résultats Détaillés - {player.name}</h1>
+            <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">
+              <span className="hidden sm:inline">📊 Résultats Détaillés - {player.name}</span>
+              <span className="sm:hidden">📊 {player.name}</span>
+            </h1>
           </div>
-          <Button onClick={handleRestart} variant="outline" className="transition-all duration-200 hover:scale-105">
+          <Button
+            onClick={handleRestart}
+            variant="outline"
+            className="transition-all duration-200 hover:scale-105 self-start sm:self-center"
+          >
             <RotateCcw className="w-4 h-4 mr-2" />
-            Recommencer
+            <span className="hidden sm:inline">Recommencer</span>
+            <span className="sm:hidden">↻</span>
           </Button>
         </div>
 
         {/* Summary Cards */}
-        <div ref={summaryRef} className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+        <div ref={summaryRef} className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-6">
           <Card className="transition-all duration-300 hover:shadow-lg hover:scale-105">
-            <CardContent className="text-center py-4">
-              <div className="text-2xl sm:text-3xl font-bold text-blue-600">{player.totalScore}</div>
-              <div className="text-sm text-gray-500">Score Total</div>
+            <CardContent className="text-center py-3 sm:py-4">
+              <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-600">{player.totalScore}</div>
+              <div className="text-xs sm:text-sm text-gray-500">Score Total</div>
             </CardContent>
           </Card>
           <Card className="transition-all duration-300 hover:shadow-lg hover:scale-105">
-            <CardContent className="text-center py-4">
-              <div className="text-2xl sm:text-3xl font-bold text-green-600">{averageScore.toFixed(1)}</div>
-              <div className="text-sm text-gray-500">Moyenne</div>
+            <CardContent className="text-center py-3 sm:py-4">
+              <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-green-600">{averageScore.toFixed(1)}</div>
+              <div className="text-xs sm:text-sm text-gray-500">Moyenne</div>
             </CardContent>
           </Card>
           <Card className="transition-all duration-300 hover:shadow-lg hover:scale-105">
-            <CardContent className="text-center py-4">
-              <div className="text-2xl sm:text-3xl font-bold text-yellow-600">{bestShot}</div>
-              <div className="text-sm text-gray-500">Meilleur Tir</div>
+            <CardContent className="text-center py-3 sm:py-4">
+              <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-yellow-600">{bestShot}</div>
+              <div className="text-xs sm:text-sm text-gray-500">Meilleur Tir</div>
             </CardContent>
           </Card>
           <Card className="transition-all duration-300 hover:shadow-lg hover:scale-105">
-            <CardContent className="text-center py-4">
-              <div className="text-2xl sm:text-3xl font-bold text-purple-600">#{playerRank}</div>
-              <div className="text-sm text-gray-500">Classement</div>
+            <CardContent className="text-center py-3 sm:py-4">
+              <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-purple-600">#{playerRank}</div>
+              <div className="text-xs sm:text-sm text-gray-500">Classement</div>
             </CardContent>
           </Card>
         </div>
 
-        <div ref={chartsRef} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div ref={chartsRef} className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {/* Evolution Chart */}
           <Card className="transition-all duration-300 hover:shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5" />
-                Évolution des Scores
+            <CardHeader className="pb-3 sm:pb-6">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="hidden sm:inline">Évolution des Scores</span>
+                <span className="sm:hidden">Évolution</span>
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="h-80">
+            <CardContent className="pt-0">
+              <div className="h-64 sm:h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={evolutionData}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="shot" label={{ value: "N° Tir", position: "insideBottom", offset: -5 }} />
-                    <YAxis label={{ value: "Score", angle: -90, position: "insideLeft" }} domain={[0, 10]} />
+                    <XAxis
+                      dataKey="shot"
+                      label={{ value: "N° Tir", position: "insideBottom", offset: -5 }}
+                      tick={{ fontSize: 10 }}
+                    />
+                    <YAxis
+                      label={{ value: "Score", angle: -90, position: "insideLeft" }}
+                      domain={[0, 10]}
+                      tick={{ fontSize: 10 }}
+                    />
                     <Tooltip
                       formatter={(value, name) => [
                         value,
                         name === "score" ? "Score du Tir" : name === "cumulative" ? "Score Cumulé" : "Moyenne",
                       ]}
                       labelFormatter={(label) => `Tir ${label}`}
+                      contentStyle={{ fontSize: "12px" }}
                     />
                     <Line
                       type="monotone"
                       dataKey="score"
                       stroke="#3b82f6"
-                      strokeWidth={3}
-                      dot={{ fill: "#3b82f6", strokeWidth: 2, r: 5 }}
+                      strokeWidth={2}
+                      dot={{ fill: "#3b82f6", strokeWidth: 2, r: 4 }}
                       name="score"
                     />
                     <Line
@@ -212,20 +231,25 @@ function ResultsPageContent() {
 
           {/* Score Distribution */}
           <Card className="transition-all duration-300 hover:shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="w-5 h-5" />
-                Distribution des Scores
+            <CardHeader className="pb-3 sm:pb-6">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <Target className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="hidden sm:inline">Distribution des Scores</span>
+                <span className="sm:hidden">Distribution</span>
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="h-80">
+            <CardContent className="pt-0">
+              <div className="h-64 sm:h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={scoreDistribution}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="score" label={{ value: "Score", position: "insideBottom", offset: -5 }} />
-                    <YAxis label={{ value: "Nombre", angle: -90, position: "insideLeft" }} />
-                    <Tooltip formatter={(value) => [value, "Nombre de tirs"]} />
+                    <XAxis
+                      dataKey="score"
+                      label={{ value: "Score", position: "insideBottom", offset: -5 }}
+                      tick={{ fontSize: 10 }}
+                    />
+                    <YAxis label={{ value: "Nombre", angle: -90, position: "insideLeft" }} tick={{ fontSize: 10 }} />
+                    <Tooltip formatter={(value) => [value, "Nombre de tirs"]} contentStyle={{ fontSize: "12px" }} />
                     <Bar dataKey="count" fill="#3b82f6" />
                   </BarChart>
                 </ResponsiveContainer>
