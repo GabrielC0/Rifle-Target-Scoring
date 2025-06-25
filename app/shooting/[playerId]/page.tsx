@@ -183,14 +183,14 @@ export default function ShootingPage() {
     (player.currentShot / player.totalShots) * 100
   );
 
-  // Prepare chart data
-  const chartData = player.scores.map((score, index) => {
-    const cumulativeScore = player.scores
+  // Prepare chart data with safety checks
+  const chartData = (player.scores || []).map((score, index) => {
+    const cumulativeScore = (player.scores || [])
       .slice(0, index + 1)
-      .reduce((sum, s) => sum + s, 0);
+      .reduce((sum, s) => sum + (s || 0), 0);
     return {
       shot: index + 1,
-      score: score,
+      score: score || 0,
       cumulative: cumulativeScore,
       average: cumulativeScore / (index + 1),
     };
@@ -263,13 +263,13 @@ export default function ShootingPage() {
                         {player.totalScore}
                       </span>
                     </span>
-                    {player.scores.length > 0 && (
+                    {(player.scores || []).length > 0 && (
                       <span>
                         Moyenne:{" "}
                         <span className="font-bold">
-                          {(player.totalScore / player.scores.length).toFixed(
-                            1
-                          )}
+                          {(
+                            player.totalScore / (player.scores || []).length
+                          ).toFixed(1)}
                         </span>
                       </span>
                     )}
@@ -392,7 +392,7 @@ export default function ShootingPage() {
                 )}
 
                 {/* Scores récents */}
-                {player.scores.length > 0 && (
+                {(player.scores || []).length > 0 && (
                   <div className="space-y-2">
                     <div className="text-sm font-medium text-gray-700">
                       <span className="hidden sm:inline">
@@ -401,7 +401,7 @@ export default function ShootingPage() {
                       <span className="sm:hidden">Scores :</span>
                     </div>
                     <div className="flex flex-wrap gap-1 sm:gap-2">
-                      {player.scores.map((score, idx) => (
+                      {(player.scores || []).map((score, idx) => (
                         <Badge
                           key={idx}
                           variant="outline"
@@ -437,58 +437,30 @@ export default function ShootingPage() {
               <CardContent className="pt-0">
                 {chartData.length > 0 ? (
                   <div className="h-64 sm:h-80">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={chartData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis
-                          dataKey="shot"
-                          label={{
-                            value: "N° Tir",
-                            position: "insideBottom",
-                            offset: -5,
-                          }}
-                          tick={{ fontSize: 10 }}
-                        />
-                        <YAxis
-                          label={{
-                            value: "Score",
-                            angle: -90,
-                            position: "insideLeft",
-                          }}
-                          domain={[0, 10]}
-                          tick={{ fontSize: 10 }}
-                        />
-                        <Tooltip
-                          formatter={(value, name) => [
-                            value,
-                            name === "score"
-                              ? "Score du Tir"
-                              : name === "cumulative"
-                              ? "Score Total"
-                              : "Moyenne",
-                          ]}
-                          labelFormatter={(label) => `Tir ${label}`}
-                          contentStyle={{ fontSize: "12px" }}
-                        />
-                        <Line
-                          type="monotone"
-                          dataKey="score"
-                          stroke="#3b82f6"
-                          strokeWidth={2}
-                          dot={{ fill: "#3b82f6", strokeWidth: 2, r: 4 }}
-                          name="score"
-                        />
-                        <Line
-                          type="monotone"
-                          dataKey="average"
-                          stroke="#10b981"
-                          strokeWidth={2}
-                          strokeDasharray="5 5"
-                          dot={false}
-                          name="average"
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
+                    <SimpleLineChart
+                      data={chartData}
+                      lines={[
+                        {
+                          dataKey: "score",
+                          stroke: "#3b82f6",
+                          name: "Score du Tir",
+                          strokeWidth: 2,
+                          dots: true,
+                        },
+                        {
+                          dataKey: "average",
+                          stroke: "#10b981",
+                          name: "Moyenne",
+                          strokeWidth: 2,
+                          strokeDasharray: "5,5",
+                          dots: false,
+                        },
+                      ]}
+                      xAxisKey="shot"
+                      xAxisLabel="N° Tir"
+                      yAxisLabel="Score"
+                      tooltipFormatter={(label: string) => `Tir ${label}`}
+                    />
                   </div>
                 ) : (
                   <div className="h-64 sm:h-80 flex items-center justify-center text-gray-500">
@@ -507,7 +479,7 @@ export default function ShootingPage() {
             </Card>
 
             {/* Quick Stats */}
-            {player.scores.length > 0 && (
+            {(player.scores || []).length > 0 && (
               <Card className="transition-all duration-300 hover:shadow-lg">
                 <CardHeader className="pb-3 sm:pb-6">
                   <CardTitle className="text-base sm:text-lg">
@@ -527,19 +499,27 @@ export default function ShootingPage() {
                     </div>
                     <div className="text-center p-2 sm:p-3 bg-green-50 rounded-lg transition-all duration-200 hover:scale-105">
                       <div className="text-lg sm:text-2xl font-bold text-green-600">
-                        {(player.totalScore / player.scores.length).toFixed(1)}
+                        {(player.scores || []).length > 0
+                          ? (
+                              player.totalScore / (player.scores || []).length
+                            ).toFixed(1)
+                          : "0.0"}
                       </div>
                       <div className="text-xs text-gray-500">Moyenne</div>
                     </div>
                     <div className="text-center p-2 sm:p-3 bg-yellow-50 rounded-lg transition-all duration-200 hover:scale-105">
                       <div className="text-lg sm:text-2xl font-bold text-yellow-600">
-                        {Math.max(...player.scores)}
+                        {(player.scores || []).length > 0
+                          ? Math.max(...(player.scores || []))
+                          : 0}
                       </div>
                       <div className="text-xs text-gray-500">Meilleur</div>
                     </div>
                     <div className="text-center p-2 sm:p-3 bg-red-50 rounded-lg transition-all duration-200 hover:scale-105">
                       <div className="text-lg sm:text-2xl font-bold text-red-600">
-                        {Math.min(...player.scores)}
+                        {(player.scores || []).length > 0
+                          ? Math.min(...(player.scores || []))
+                          : 0}
                       </div>
                       <div className="text-xs text-gray-500">Plus Faible</div>
                     </div>

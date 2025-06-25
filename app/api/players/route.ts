@@ -19,11 +19,12 @@ export async function GET() {
 
     // Calculer les statistiques pour chaque joueur
     const playersWithStats = players.map((player) => {
-      const totalScore = player.scores.reduce(
-        (sum, score) => sum + score.value,
+      const validScores = player.scores || [];
+      const totalScore = validScores.reduce(
+        (sum, score) => sum + (score.value || 0),
         0
       );
-      const shotCount = player.scores.length;
+      const shotCount = validScores.length;
       const averageScore = shotCount > 0 ? totalScore / shotCount : 0;
 
       return {
@@ -32,7 +33,7 @@ export async function GET() {
         totalScore,
         averageScore: Number(averageScore.toFixed(2)),
         shotCount,
-        scores: player.scores.map((score) => score.value),
+        scores: validScores.map((score) => score.value || 0),
         totalShots: 10, // Par défaut
         createdAt: player.createdAt,
         updatedAt: player.updatedAt,

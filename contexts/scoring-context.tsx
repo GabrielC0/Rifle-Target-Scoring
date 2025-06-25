@@ -219,9 +219,9 @@ export function ScoringProvider({ children }: { children: React.ReactNode }) {
     id: dbPlayer.id,
     name: dbPlayer.name,
     totalShots: 10, // Par défaut
-    currentShot: dbPlayer.scores.length,
-    scores: dbPlayer.scores,
-    totalScore: dbPlayer.totalScore,
+    currentShot: (dbPlayer.scores || []).length,
+    scores: dbPlayer.scores || [],
+    totalScore: dbPlayer.totalScore || 0,
   });
 
   // Charger les joueurs depuis la base de données

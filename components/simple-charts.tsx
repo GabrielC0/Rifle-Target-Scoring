@@ -45,57 +45,70 @@ export function SimpleLineChart({
   tooltipFormatter = (label: string) => `Tir ${label}`,
 }: SimpleLineChartProps) {
   const chartData = useMemo(() => {
-    if (!data || data.length === 0) return null;
+    try {
+      if (!data || data.length === 0) return null;
 
-    const padding = 40;
-    const chartWidth = width - padding * 2;
-    const chartHeight = height - padding * 2;
+      const padding = 40;
+      const chartWidth = width - padding * 2;
+      const chartHeight = height - padding * 2;
 
-    // Calculate max/min values from all lines
-    const allValues = data.flatMap((point) =>
-      lines
-        .map((line) => point[line.dataKey] || 0)
-        .filter((val) => val !== null && val !== undefined)
-    );
-    const maxScore = Math.max(...allValues, 0);
-    const minScore = Math.min(...allValues, 0);
-    const scoreRange = maxScore - minScore || 1;
+      // Calculate max/min values from all lines with better safety checks
+      const allValues = data.flatMap((point) =>
+        lines
+          .map((line) => {
+            const value = point?.[line.dataKey];
+            return typeof value === "number" && !isNaN(value) ? value : null;
+          })
+          .filter((val) => val !== null && val !== undefined)
+      );
 
-    // Generate points for each line
-    const linePoints = lines.map((line) => {
-      return data
-        .map((point, index) => {
-          const x = padding + (index / (data.length - 1 || 1)) * chartWidth;
-          const value = point[line.dataKey];
-          const y =
-            value !== null && value !== undefined
-              ? padding +
-                chartHeight -
-                ((value - minScore) / scoreRange) * chartHeight
-              : null;
+      if (allValues.length === 0) return null;
 
-          return { x, y, value, xValue: point[xAxisKey] };
-        })
-        .filter((p) => p.y !== null);
-    });
+      const maxScore = Math.max(...allValues, 0);
+      const minScore = Math.min(...allValues, 0);
+      const scoreRange = maxScore - minScore || 1;
 
-    return {
-      padding,
-      chartWidth,
-      chartHeight,
-      maxScore,
-      minScore,
-      scoreRange,
-      linePoints,
-      xAxisPoints: data.map(
-        (_, index) => padding + (index / (data.length - 1 || 1)) * chartWidth
-      ),
-      yAxisTicks: Array.from({ length: 6 }, (_, i) => {
-        const value = minScore + (i / 5) * scoreRange;
-        const y = padding + chartHeight - (i / 5) * chartHeight;
-        return { value: Math.round(value * 10) / 10, y };
-      }),
-    };
+      // Generate points for each line with safety checks
+      const linePoints = lines.map((line) => {
+        return data
+          .map((point, index) => {
+            if (!point || typeof point !== "object") return null;
+
+            const x = padding + (index / (data.length - 1 || 1)) * chartWidth;
+            const value = point[line.dataKey];
+            const y =
+              typeof value === "number" && !isNaN(value)
+                ? padding +
+                  chartHeight -
+                  ((value - minScore) / scoreRange) * chartHeight
+                : null;
+
+            return { x, y, value, xValue: point[xAxisKey] };
+          })
+          .filter((p) => p !== null && p.y !== null);
+      });
+
+      return {
+        padding,
+        chartWidth,
+        chartHeight,
+        maxScore,
+        minScore,
+        scoreRange,
+        linePoints,
+        xAxisPoints: data.map(
+          (_, index) => padding + (index / (data.length - 1 || 1)) * chartWidth
+        ),
+        yAxisTicks: Array.from({ length: 6 }, (_, i) => {
+          const value = minScore + (i / 5) * scoreRange;
+          const y = padding + chartHeight - (i / 5) * chartHeight;
+          return { value: Math.round(value * 10) / 10, y };
+        }),
+      };
+    } catch (error) {
+      console.error("Error in SimpleLineChart chartData calculation:", error);
+      return null;
+    }
   }, [data, lines, width, height, xAxisKey]);
 
   if (!chartData) {
@@ -190,7 +203,11 @@ export function SimpleLineChart({
 
         {/* X-axis labels */}
         {data.map((point, index) => {
+          if (!point || typeof point !== "object") return null;
           const x = xAxisPoints[index];
+          const labelValue = point[xAxisKey];
+          if (labelValue === undefined || labelValue === null) return null;
+
           return (
             <g key={index}>
               <line
@@ -208,7 +225,7 @@ export function SimpleLineChart({
                 fontSize="12"
                 fill="#6b7280"
               >
-                {point[xAxisKey]}
+                {labelValue}
               </text>
             </g>
           );
@@ -217,9 +234,12 @@ export function SimpleLineChart({
         {/* Draw lines */}
         {linePoints.map((points, lineIndex) => {
           const line = lines[lineIndex];
-          if (points.length < 2) return null;
+          const validPoints = points.filter(
+            (p): p is NonNullable<typeof p> => p !== null && p.y !== null
+          );
+          if (validPoints.length < 2) return null;
 
-          const pathData = points.reduce((acc, point, index) => {
+          const pathData = validPoints.reduce((acc, point, index) => {
             if (index === 0) {
               return `M ${point.x} ${point.y}`;
             }
@@ -237,7 +257,7 @@ export function SimpleLineChart({
               />
               {/* Draw dots if enabled */}
               {line.dots !== false &&
-                points.map((point, pointIndex) => (
+                validPoints.map((point, pointIndex) => (
                   <circle
                     key={pointIndex}
                     cx={point.x}
