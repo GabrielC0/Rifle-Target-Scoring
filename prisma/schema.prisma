@@ -8,8 +8,6 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  // Configuration pour Prisma Accelerate
-  directUrl = env("DIRECT_DATABASE_URL")
 }
 
 model Player {
