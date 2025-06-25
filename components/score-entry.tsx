@@ -9,31 +9,44 @@ import { useScoring } from "@/contexts/scoring-context"
 import { Target, Plus } from "lucide-react"
 
 export function ScoreEntry() {
-  const { state, dispatch } = useScoring()
+  const { state, dispatch, addScoreAsync } = useScoring()
   const [scoreInput, setScoreInput] = useState("")
 
   const currentPlayer = state.players.find((p) => p.id === state.currentPlayerId)
 
-  const handleAddScore = () => {
+  const handleAddScore = async () => {
     if (!currentPlayer || !scoreInput.trim()) return
 
     const score = Number.parseFloat(scoreInput)
     if (isNaN(score) || score < 0 || score > 10) return
 
-    dispatch({
-      type: "ADD_SCORE",
-      payload: { playerId: currentPlayer.id, score },
-    })
-    setScoreInput("")
+    try {
+      await addScoreAsync(currentPlayer.id, score)
+      setScoreInput("")
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout du score:', error)
+      // Fallback sur dispatch en cas d'erreur
+      dispatch({
+        type: "ADD_SCORE",
+        payload: { playerId: currentPlayer.id, score },
+      })
+      setScoreInput("")
+    }
   }
 
-  const handleQuickScore = (score: number) => {
+  const handleQuickScore = async (score: number) => {
     if (!currentPlayer) return
 
-    dispatch({
-      type: "ADD_SCORE",
-      payload: { playerId: currentPlayer.id, score },
-    })
+    try {
+      await addScoreAsync(currentPlayer.id, score)
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout du score:', error)
+      // Fallback sur dispatch en cas d'erreur
+      dispatch({
+        type: "ADD_SCORE",
+        payload: { playerId: currentPlayer.id, score },
+      })
+    }
   }
 
   if (!currentPlayer) {

@@ -1,0 +1,72 @@
+// Schema Prisma pour PostgreSQL (Production)
+// Remplacer dans prisma/schema.prisma quand vous déployez sur Vercel
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Player {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sessions Session[]
+  scores   Score[]
+
+  @@map("players")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  playerId  String
+  startTime DateTime @default(now())
+  endTime   DateTime?
+  isActive  Boolean  @default(true)
+  
+  // Configuration de session
+  targetDistance String @default("50m")
+  targetType     String @default("standard")
+  maxShots       Int    @default(10)
+  
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  scores Score[]
+
+  @@map("sessions")
+}
+
+model Score {
+  id        String   @id @default(cuid())
+  playerId  String
+  sessionId String?
+  
+  // Données du tir
+  shotNumber Int
+  value      Float
+  x          Float?   // Position X sur la cible (pour calcul précision)
+  y          Float?   // Position Y sur la cible (pour calcul précision)
+  precision  Float?   // Pourcentage de précision (distance du centre)
+  ring       Int?     // Anneau touché (1-10)
+  
+  // Métadonnées
+  timestamp  DateTime @default(now())
+  notes      String?
+  
+  player  Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  session Session? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+
+  @@map("scores")
+}
+
+model Settings {
+  id    String @id @default("default")
+  key   String @unique
+  value String
+  
+  @@map("settings")
+}

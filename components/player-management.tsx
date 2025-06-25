@@ -24,7 +24,7 @@ type SortType =
 
 export function PlayerManagement() {
   const router = useRouter()
-  const { state, dispatch } = useScoring()
+  const { state, dispatch, addPlayerAsync, removePlayerAsync, resetPlayerScoresAsync } = useScoring()
   const [newPlayerName, setNewPlayerName] = useState("")
   const [newPlayerShots, setNewPlayerShots] = useState(10)
   const [filter, setFilter] = useState<FilterType>("all")
@@ -96,29 +96,36 @@ export function PlayerManagement() {
     }
   }, [state.players.length, filter, sort])
 
-  const handleAddPlayer = () => {
+  const handleAddPlayer = async () => {
     if (newPlayerName.trim()) {
-      dispatch({
-        type: "ADD_PLAYER",
-        payload: { name: newPlayerName.trim(), totalShots: newPlayerShots },
-      })
-      setNewPlayerName("")
+      try {
+        await addPlayerAsync(newPlayerName.trim(), newPlayerShots)
+        setNewPlayerName("")
 
-      // Animation du bouton d'ajout
-      const addButton = document.querySelector("[data-add-button]")
-      if (addButton) {
-        gsap.to(addButton, {
-          scale: 1.1,
-          duration: 0.1,
-          yoyo: true,
-          repeat: 1,
-          ease: "power2.inOut",
+        // Animation du bouton d'ajout
+        const addButton = document.querySelector("[data-add-button]")
+        if (addButton) {
+          gsap.to(addButton, {
+            scale: 1.1,
+            duration: 0.1,
+            yoyo: true,
+            repeat: 1,
+            ease: "power2.inOut",
+          })
+        }
+      } catch (error) {
+        console.error('Erreur lors de l\'ajout du joueur:', error)
+        // Fallback sur dispatch en cas d'erreur
+        dispatch({
+          type: "ADD_PLAYER",
+          payload: { name: newPlayerName.trim(), totalShots: newPlayerShots },
         })
+        setNewPlayerName("")
       }
     }
   }
 
-  const handleRemovePlayer = (id: string) => {
+  const handleRemovePlayer = async (id: string) => {
     const playerCard = document.querySelector(`[data-player-id="${id}"]`)
     if (playerCard) {
       gsap.to(playerCard, {
@@ -126,15 +133,27 @@ export function PlayerManagement() {
         opacity: 0,
         duration: 0.3,
         ease: "power2.in",
-        onComplete: () => {
-          dispatch({ type: "REMOVE_PLAYER", payload: { id } })
+        onComplete: async () => {
+          try {
+            await removePlayerAsync(id)
+          } catch (error) {
+            console.error('Erreur lors de la suppression du joueur:', error)
+            // Fallback sur dispatch en cas d'erreur
+            dispatch({ type: "REMOVE_PLAYER", payload: { id } })
+          }
         },
       })
     }
   }
 
-  const handleResetPlayer = (id: string) => {
-    dispatch({ type: "RESET_PLAYER_SCORES", payload: { id } })
+  const handleResetPlayer = async (id: string) => {
+    try {
+      await resetPlayerScoresAsync(id)
+    } catch (error) {
+      console.error('Erreur lors de la réinitialisation des scores:', error)
+      // Fallback sur dispatch en cas d'erreur
+      dispatch({ type: "RESET_PLAYER_SCORES", payload: { id } })
+    }
 
     // Animation de reset
     const playerCard = document.querySelector(`[data-player-id="${id}"]`)
