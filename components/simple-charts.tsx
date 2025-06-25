@@ -33,7 +33,10 @@ interface SimpleLineChartProps {
 
 export function SimpleLineChart({
   data,
-  lines = [{ dataKey: "score", stroke: "#3b82f6" }, { dataKey: "average", stroke: "#ef4444" }],
+  lines = [
+    { dataKey: "score", stroke: "#3b82f6" },
+    { dataKey: "average", stroke: "#ef4444" },
+  ],
   width = 400,
   height = 300,
   xAxisKey = "shot",
@@ -49,24 +52,31 @@ export function SimpleLineChart({
     const chartHeight = height - padding * 2;
 
     // Calculate max/min values from all lines
-    const allValues = data.flatMap(point => 
-      lines.map(line => point[line.dataKey] || 0).filter(val => val !== null && val !== undefined)
+    const allValues = data.flatMap((point) =>
+      lines
+        .map((line) => point[line.dataKey] || 0)
+        .filter((val) => val !== null && val !== undefined)
     );
     const maxScore = Math.max(...allValues, 0);
     const minScore = Math.min(...allValues, 0);
     const scoreRange = maxScore - minScore || 1;
 
     // Generate points for each line
-    const linePoints = lines.map(line => {
-      return data.map((point, index) => {
-        const x = padding + (index / (data.length - 1 || 1)) * chartWidth;
-        const value = point[line.dataKey];
-        const y = value !== null && value !== undefined
-          ? padding + chartHeight - (((value - minScore) / scoreRange) * chartHeight)
-          : null;
+    const linePoints = lines.map((line) => {
+      return data
+        .map((point, index) => {
+          const x = padding + (index / (data.length - 1 || 1)) * chartWidth;
+          const value = point[line.dataKey];
+          const y =
+            value !== null && value !== undefined
+              ? padding +
+                chartHeight -
+                ((value - minScore) / scoreRange) * chartHeight
+              : null;
 
-        return { x, y, value, xValue: point[xAxisKey] };
-      }).filter(p => p.y !== null);
+          return { x, y, value, xValue: point[xAxisKey] };
+        })
+        .filter((p) => p.y !== null);
     });
 
     return {
@@ -77,8 +87,8 @@ export function SimpleLineChart({
       minScore,
       scoreRange,
       linePoints,
-      xAxisPoints: data.map((_, index) => 
-        padding + (index / (data.length - 1 || 1)) * chartWidth
+      xAxisPoints: data.map(
+        (_, index) => padding + (index / (data.length - 1 || 1)) * chartWidth
       ),
       yAxisTicks: Array.from({ length: 6 }, (_, i) => {
         const value = minScore + (i / 5) * scoreRange;
@@ -90,7 +100,7 @@ export function SimpleLineChart({
 
   if (!chartData) {
     return (
-      <div 
+      <div
         className="flex items-center justify-center text-gray-500"
         style={{ width, height }}
       >
@@ -99,55 +109,78 @@ export function SimpleLineChart({
     );
   }
 
-  const { padding, chartWidth, chartHeight, linePoints, xAxisPoints, yAxisTicks } = chartData;
+  const {
+    padding,
+    chartWidth,
+    chartHeight,
+    linePoints,
+    xAxisPoints,
+    yAxisTicks,
+  } = chartData;
 
   return (
     <div className="w-full h-full">
       <svg width={width} height={height} className="border rounded">
         {/* Grid lines */}
         <defs>
-          <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e5e7eb" strokeWidth="1"/>
+          <pattern
+            id="grid"
+            width="20"
+            height="20"
+            patternUnits="userSpaceOnUse"
+          >
+            <path
+              d="M 20 0 L 0 0 0 20"
+              fill="none"
+              stroke="#e5e7eb"
+              strokeWidth="1"
+            />
           </pattern>
         </defs>
-        <rect width={chartWidth} height={chartHeight} x={padding} y={padding} fill="url(#grid)" />
+        <rect
+          width={chartWidth}
+          height={chartHeight}
+          x={padding}
+          y={padding}
+          fill="url(#grid)"
+        />
 
         {/* Y-axis */}
-        <line 
-          x1={padding} 
-          y1={padding} 
-          x2={padding} 
-          y2={padding + chartHeight} 
-          stroke="#6b7280" 
+        <line
+          x1={padding}
+          y1={padding}
+          x2={padding}
+          y2={padding + chartHeight}
+          stroke="#6b7280"
           strokeWidth="1"
         />
-        
+
         {/* X-axis */}
-        <line 
-          x1={padding} 
-          y1={padding + chartHeight} 
-          x2={padding + chartWidth} 
-          y2={padding + chartHeight} 
-          stroke="#6b7280" 
+        <line
+          x1={padding}
+          y1={padding + chartHeight}
+          x2={padding + chartWidth}
+          y2={padding + chartHeight}
+          stroke="#6b7280"
           strokeWidth="1"
         />
 
         {/* Y-axis labels */}
         {yAxisTicks.map((tick, index) => (
           <g key={index}>
-            <line 
-              x1={padding - 5} 
-              y1={tick.y} 
-              x2={padding} 
-              y2={tick.y} 
-              stroke="#6b7280" 
+            <line
+              x1={padding - 5}
+              y1={tick.y}
+              x2={padding}
+              y2={tick.y}
+              stroke="#6b7280"
               strokeWidth="1"
             />
-            <text 
-              x={padding - 10} 
-              y={tick.y + 4} 
-              textAnchor="end" 
-              fontSize="12" 
+            <text
+              x={padding - 10}
+              y={tick.y + 4}
+              textAnchor="end"
+              fontSize="12"
               fill="#6b7280"
             >
               {tick.value}
@@ -160,19 +193,19 @@ export function SimpleLineChart({
           const x = xAxisPoints[index];
           return (
             <g key={index}>
-              <line 
-                x1={x} 
-                y1={padding + chartHeight} 
-                x2={x} 
-                y2={padding + chartHeight + 5} 
-                stroke="#6b7280" 
+              <line
+                x1={x}
+                y1={padding + chartHeight}
+                x2={x}
+                y2={padding + chartHeight + 5}
+                stroke="#6b7280"
                 strokeWidth="1"
               />
-              <text 
-                x={x} 
-                y={padding + chartHeight + 20} 
-                textAnchor="middle" 
-                fontSize="12" 
+              <text
+                x={x}
+                y={padding + chartHeight + 20}
+                textAnchor="middle"
+                fontSize="12"
                 fill="#6b7280"
               >
                 {point[xAxisKey]}
@@ -203,36 +236,37 @@ export function SimpleLineChart({
                 strokeDasharray={line.strokeDasharray}
               />
               {/* Draw dots if enabled */}
-              {line.dots !== false && points.map((point, pointIndex) => (
-                <circle
-                  key={pointIndex}
-                  cx={point.x}
-                  cy={point.y || 0}
-                  r="3"
-                  fill={line.stroke}
-                  stroke="white"
-                  strokeWidth="2"
-                />
-              ))}
+              {line.dots !== false &&
+                points.map((point, pointIndex) => (
+                  <circle
+                    key={pointIndex}
+                    cx={point.x}
+                    cy={point.y || 0}
+                    r="3"
+                    fill={line.stroke}
+                    stroke="white"
+                    strokeWidth="2"
+                  />
+                ))}
             </g>
           );
         })}
 
         {/* Axis labels */}
-        <text 
-          x={padding + chartWidth / 2} 
-          y={height - 5} 
-          textAnchor="middle" 
-          fontSize="14" 
+        <text
+          x={padding + chartWidth / 2}
+          y={height - 5}
+          textAnchor="middle"
+          fontSize="14"
           fill="#374151"
         >
           {xAxisLabel}
         </text>
-        <text 
-          x={15} 
-          y={padding + chartHeight / 2} 
-          textAnchor="middle" 
-          fontSize="14" 
+        <text
+          x={15}
+          y={padding + chartHeight / 2}
+          textAnchor="middle"
+          fontSize="14"
           fill="#374151"
           transform={`rotate(-90, 15, ${padding + chartHeight / 2})`}
         >
@@ -250,7 +284,11 @@ interface PrecisionChartProps {
   height?: number;
 }
 
-export function PrecisionChart({ scores, width = 300, height = 300 }: PrecisionChartProps) {
+export function PrecisionChart({
+  scores,
+  width = 300,
+  height = 300,
+}: PrecisionChartProps) {
   const chartData = useMemo(() => {
     if (!scores || scores.length === 0) return null;
 
@@ -262,7 +300,7 @@ export function PrecisionChart({ scores, width = 300, height = 300 }: PrecisionC
     const points = scores.map((score, index) => {
       const angle = (index / scores.length) * 2 * Math.PI;
       const radius = ((10 - score) / 10) * maxRadius;
-      
+
       return {
         x: centerX + Math.cos(angle) * radius,
         y: centerY + Math.sin(angle) * radius,
@@ -276,7 +314,7 @@ export function PrecisionChart({ scores, width = 300, height = 300 }: PrecisionC
 
   if (!chartData) {
     return (
-      <div 
+      <div
         className="flex items-center justify-center text-gray-500"
         style={{ width, height }}
       >
@@ -304,12 +342,7 @@ export function PrecisionChart({ scores, width = 300, height = 300 }: PrecisionC
         ))}
 
         {/* Center point */}
-        <circle
-          cx={centerX}
-          cy={centerY}
-          r="3"
-          fill="#ef4444"
-        />
+        <circle cx={centerX} cy={centerY} r="3" fill="#ef4444" />
 
         {/* Score points */}
         {points.map((point, index) => (
@@ -335,11 +368,51 @@ export function PrecisionChart({ scores, width = 300, height = 300 }: PrecisionC
         ))}
 
         {/* Score labels on rings */}
-        <text x={centerX + maxRadius * 0.2} y={centerY + 4} textAnchor="middle" fontSize="10" fill="#6b7280">10</text>
-        <text x={centerX + maxRadius * 0.4} y={centerY + 4} textAnchor="middle" fontSize="10" fill="#6b7280">8</text>
-        <text x={centerX + maxRadius * 0.6} y={centerY + 4} textAnchor="middle" fontSize="10" fill="#6b7280">6</text>
-        <text x={centerX + maxRadius * 0.8} y={centerY + 4} textAnchor="middle" fontSize="10" fill="#6b7280">4</text>
-        <text x={centerX + maxRadius * 1.0} y={centerY + 4} textAnchor="middle" fontSize="10" fill="#6b7280">0</text>
+        <text
+          x={centerX + maxRadius * 0.2}
+          y={centerY + 4}
+          textAnchor="middle"
+          fontSize="10"
+          fill="#6b7280"
+        >
+          10
+        </text>
+        <text
+          x={centerX + maxRadius * 0.4}
+          y={centerY + 4}
+          textAnchor="middle"
+          fontSize="10"
+          fill="#6b7280"
+        >
+          8
+        </text>
+        <text
+          x={centerX + maxRadius * 0.6}
+          y={centerY + 4}
+          textAnchor="middle"
+          fontSize="10"
+          fill="#6b7280"
+        >
+          6
+        </text>
+        <text
+          x={centerX + maxRadius * 0.8}
+          y={centerY + 4}
+          textAnchor="middle"
+          fontSize="10"
+          fill="#6b7280"
+        >
+          4
+        </text>
+        <text
+          x={centerX + maxRadius * 1.0}
+          y={centerY + 4}
+          textAnchor="middle"
+          fontSize="10"
+          fill="#6b7280"
+        >
+          0
+        </text>
       </svg>
     </div>
   );
@@ -352,17 +425,17 @@ interface DistributionChartProps {
   height?: number;
 }
 
-export function DistributionChart({ 
-  data, 
-  width = 400, 
-  height = 200 
+export function DistributionChart({
+  data,
+  width = 400,
+  height = 200,
 }: DistributionChartProps) {
   const chartData = useMemo(() => {
     if (!data || data.length === 0) return null;
 
     const padding = 40;
     const barWidth = (width - padding * 2) / data.length;
-    const maxValue = Math.max(...data.map(d => d.value));
+    const maxValue = Math.max(...data.map((d) => d.value));
     const chartHeight = height - padding * 2;
 
     const bars = data.map((item, index) => {
@@ -386,7 +459,7 @@ export function DistributionChart({
 
   if (!chartData) {
     return (
-      <div 
+      <div
         className="flex items-center justify-center text-gray-500"
         style={{ width, height }}
       >
@@ -401,22 +474,22 @@ export function DistributionChart({
     <div className="w-full h-full">
       <svg width={width} height={height} className="border rounded">
         {/* Y-axis */}
-        <line 
-          x1={padding} 
-          y1={padding} 
-          x2={padding} 
-          y2={padding + chartHeight} 
-          stroke="#6b7280" 
+        <line
+          x1={padding}
+          y1={padding}
+          x2={padding}
+          y2={padding + chartHeight}
+          stroke="#6b7280"
           strokeWidth="1"
         />
-        
+
         {/* X-axis */}
-        <line 
-          x1={padding} 
-          y1={padding + chartHeight} 
-          x2={width - padding} 
-          y2={padding + chartHeight} 
-          stroke="#6b7280" 
+        <line
+          x1={padding}
+          y1={padding + chartHeight}
+          x2={width - padding}
+          y2={padding + chartHeight}
+          stroke="#6b7280"
           strokeWidth="1"
         />
 
