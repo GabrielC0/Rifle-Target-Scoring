@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useScoring } from "@/contexts/scoring-context"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+import { SimpleLineChart } from "@/components/simple-charts"
 import { Trophy } from "lucide-react"
 
 export function TopScorerPanel() {
@@ -88,45 +88,30 @@ export function TopScorerPanel() {
 
         {/* Chart */}
         <div className="h-48 sm:h-64">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                dataKey="shot"
-                label={{ value: "N° Tir", position: "insideBottom", offset: -5 }}
-                tick={{ fontSize: 12 }}
-              />
-              <YAxis
-                label={{ value: "Score", angle: -90, position: "insideLeft" }}
-                domain={[0, 10]}
-                tick={{ fontSize: 12 }}
-              />
-              <Tooltip
-                formatter={(value, name) => [
-                  value,
-                  name === "score" ? "Score Tir" : name === "cumulative" ? "Score Total" : "Moyenne",
-                ]}
-                labelFormatter={(label) => `Tir ${label}`}
-              />
-              <Line
-                type="monotone"
-                dataKey="score"
-                stroke="#eab308"
-                strokeWidth={2}
-                dot={{ fill: "#eab308", strokeWidth: 2, r: 3 }}
-                name="score"
-              />
-              <Line
-                type="monotone"
-                dataKey="average"
-                stroke="#3b82f6"
-                strokeWidth={1}
-                strokeDasharray="5 5"
-                dot={false}
-                name="average"
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <SimpleLineChart
+            data={chartData}
+            lines={[
+              {
+                dataKey: "score",
+                stroke: "#eab308",
+                name: "Score Tir",
+                strokeWidth: 2,
+                dots: true
+              },
+              {
+                dataKey: "average",
+                stroke: "#3b82f6", 
+                name: "Moyenne",
+                strokeWidth: 1,
+                strokeDasharray: "5,5",
+                dots: false
+              }
+            ]}
+            xAxisKey="shot"
+            xAxisLabel="N° Tir"
+            yAxisLabel="Score"
+            tooltipFormatter={(label: string) => `Tir ${label}`}
+          />
         </div>
 
         {/* Recent Scores */}

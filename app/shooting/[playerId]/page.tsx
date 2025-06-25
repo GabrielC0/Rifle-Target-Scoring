@@ -10,14 +10,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+  SimpleLineChart,
+  SimpleBarChart,
+  PrecisionChart,
+} from "@/components/simple-charts";
 import { Target, ArrowLeft, Home } from "lucide-react";
 
 export default function ShootingPage() {

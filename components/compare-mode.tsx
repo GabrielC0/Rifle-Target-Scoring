@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useScoring } from "@/contexts/scoring-context"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+import { SimpleLineChart } from "@/components/simple-charts"
 import { GitCompare, TrendingUp, TrendingDown, Palette } from "lucide-react"
 import { getPlayerColorByIndex } from "@/utils/colors"
 
@@ -195,68 +195,45 @@ export function CompareMode() {
 
         {/* Comparison Chart */}
         <div className="h-48 sm:h-64">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                dataKey="shot"
-                label={{ value: "N° Tir", position: "insideBottom", offset: -5 }}
-                tick={{ fontSize: 12 }}
-              />
-              <YAxis label={{ value: "Score Cumulé", angle: -90, position: "insideLeft" }} tick={{ fontSize: 12 }} />
-              <Tooltip
-                formatter={(value, name) => [
-                  value,
-                  name === "currentCumulative"
-                    ? `${currentPlayer.name} Total`
-                    : name === "topCumulative"
-                      ? `${topScorer.name} Total`
-                      : name === "currentAverage"
-                        ? `${currentPlayer.name} Moy`
-                        : `${topScorer.name} Moy`,
-                ]}
-                labelFormatter={(label) => `Après Tir ${label}`}
-              />
-              <Line
-                type="monotone"
-                dataKey="currentCumulative"
-                stroke={currentPlayerColor.primary}
-                strokeWidth={2}
-                dot={{ fill: currentPlayerColor.primary, strokeWidth: 2, r: 3 }}
-                name="currentCumulative"
-                connectNulls={false}
-              />
-              <Line
-                type="monotone"
-                dataKey="topCumulative"
-                stroke={topScorerColor.primary}
-                strokeWidth={2}
-                dot={{ fill: topScorerColor.primary, strokeWidth: 2, r: 3 }}
-                name="topCumulative"
-                connectNulls={false}
-              />
-              <Line
-                type="monotone"
-                dataKey="currentAverage"
-                stroke={currentPlayerColor.primary}
-                strokeWidth={1}
-                strokeDasharray="5 5"
-                dot={false}
-                name="currentAverage"
-                connectNulls={false}
-              />
-              <Line
-                type="monotone"
-                dataKey="topAverage"
-                stroke={topScorerColor.primary}
-                strokeWidth={1}
-                strokeDasharray="5 5"
-                dot={false}
-                name="topAverage"
-                connectNulls={false}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <SimpleLineChart
+            data={chartData}
+            lines={[
+              {
+                dataKey: "currentCumulative",
+                stroke: currentPlayerColor.primary,
+                name: `${currentPlayer.name} Total`,
+                strokeWidth: 2,
+                dots: true
+              },
+              {
+                dataKey: "topCumulative", 
+                stroke: topScorerColor.primary,
+                name: `${topScorer.name} Total`,
+                strokeWidth: 2,
+                dots: true
+              },
+              {
+                dataKey: "currentAverage",
+                stroke: currentPlayerColor.primary,
+                name: `${currentPlayer.name} Moy`,
+                strokeWidth: 1,
+                strokeDasharray: "5,5",
+                dots: false
+              },
+              {
+                dataKey: "topAverage",
+                stroke: topScorerColor.primary, 
+                name: `${topScorer.name} Moy`,
+                strokeWidth: 1,
+                strokeDasharray: "5,5",
+                dots: false
+              }
+            ]}
+            xAxisKey="shot"
+            xAxisLabel="N° Tir"
+            yAxisLabel="Score Cumulé"
+            tooltipFormatter={(label: string) => `Après Tir ${label}`}
+          />
         </div>
 
         {/* Shot-by-Shot Comparison */}
