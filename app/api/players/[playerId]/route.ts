@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 export async function GET(
   request: NextRequest,
@@ -11,48 +11,48 @@ export async function GET(
       include: {
         scores: {
           orderBy: {
-            shotNumber: 'asc'
-          }
+            shotNumber: "asc",
+          },
         },
         sessions: {
           include: {
-            scores: true
-          }
-        }
-      }
-    })
-    
+            scores: true,
+          },
+        },
+      },
+    });
+
     if (!player) {
-      return NextResponse.json(
-        { error: 'Joueur non trouvé' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: "Joueur non trouvé" }, { status: 404 });
     }
-    
+
     // Calculer les statistiques
-    const totalScore = player.scores.reduce((sum, score) => sum + score.value, 0)
-    const shotCount = player.scores.length
-    const averageScore = shotCount > 0 ? totalScore / shotCount : 0
-    
+    const totalScore = player.scores.reduce(
+      (sum, score) => sum + score.value,
+      0
+    );
+    const shotCount = player.scores.length;
+    const averageScore = shotCount > 0 ? totalScore / shotCount : 0;
+
     const playerWithStats = {
       id: player.id,
       name: player.name,
       totalScore,
       averageScore: Number(averageScore.toFixed(2)),
       shotCount,
-      scores: player.scores.map(score => score.value),
+      scores: player.scores.map((score) => score.value),
       totalShots: 10,
       createdAt: player.createdAt,
-      updatedAt: player.updatedAt
-    }
-    
-    return NextResponse.json(playerWithStats)
+      updatedAt: player.updatedAt,
+    };
+
+    return NextResponse.json(playerWithStats);
   } catch (error) {
-    console.error('Erreur lors de la récupération du joueur:', error)
+    console.error("Erreur lors de la récupération du joueur:", error);
     return NextResponse.json(
-      { error: 'Erreur lors de la récupération du joueur' },
+      { error: "Erreur lors de la récupération du joueur" },
       { status: 500 }
-    )
+    );
   }
 }
 
@@ -62,23 +62,20 @@ export async function DELETE(
 ) {
   try {
     await prisma.player.delete({
-      where: { id: params.playerId }
-    })
-    
-    return NextResponse.json({ success: true })
+      where: { id: params.playerId },
+    });
+
+    return NextResponse.json({ success: true });
   } catch (error: any) {
-    console.error('Erreur lors de la suppression du joueur:', error)
-    
-    if (error.code === 'P2025') {
-      return NextResponse.json(
-        { error: 'Joueur non trouvé' },
-        { status: 404 }
-      )
+    console.error("Erreur lors de la suppression du joueur:", error);
+
+    if (error.code === "P2025") {
+      return NextResponse.json({ error: "Joueur non trouvé" }, { status: 404 });
     }
-    
+
     return NextResponse.json(
-      { error: 'Erreur lors de la suppression du joueur' },
+      { error: "Erreur lors de la suppression du joueur" },
       { status: 500 }
-    )
+    );
   }
 }

@@ -1,7 +1,13 @@
 "use client";
 
 import type React from "react";
-import { createContext, useContext, useReducer, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useReducer,
+  useEffect,
+  useState,
+} from "react";
 import { apiService, type Player as DbPlayer } from "@/lib/api-service";
 
 export interface Player {
@@ -32,7 +38,10 @@ type ScoringAction =
   | { type: "SET_LOADING"; payload: boolean }
   | { type: "SET_ERROR"; payload: string | null }
   | { type: "LOAD_PLAYERS"; payload: Player[] }
-  | { type: "SET_DB_STATUS"; payload: { connected: boolean; message?: string } };
+  | {
+      type: "SET_DB_STATUS";
+      payload: { connected: boolean; message?: string };
+    };
 
 const initialState: ScoringState = {
   players: [],
@@ -223,8 +232,11 @@ export function ScoringProvider({ children }: { children: React.ReactNode }) {
       const players = dbPlayers.map(convertDbPlayerToPlayer);
       dispatch({ type: "LOAD_PLAYERS", payload: players });
     } catch (error) {
-      console.error('Erreur lors du chargement des joueurs:', error);
-      dispatch({ type: "SET_ERROR", payload: "Erreur lors du chargement des joueurs" });
+      console.error("Erreur lors du chargement des joueurs:", error);
+      dispatch({
+        type: "SET_ERROR",
+        payload: "Erreur lors du chargement des joueurs",
+      });
       // Fallback sur localStorage en cas d'erreur
       loadFromLocalStorage();
     }
@@ -237,14 +249,17 @@ export function ScoringProvider({ children }: { children: React.ReactNode }) {
       const dbPlayer = await apiService.createPlayer(name);
       const player = convertDbPlayerToPlayer(dbPlayer);
       player.totalShots = totalShots; // Appliquer le nombre de tirs
-      
+
       // Mettre à jour l'état local
       dispatch({ type: "ADD_PLAYER", payload: { name, totalShots } });
       // Recharger pour être sûr d'avoir l'état synchronisé
       await loadPlayersAsync();
     } catch (error) {
-      console.error('Erreur lors de l\'ajout du joueur:', error);
-      dispatch({ type: "SET_ERROR", payload: "Erreur lors de l'ajout du joueur" });
+      console.error("Erreur lors de l'ajout du joueur:", error);
+      dispatch({
+        type: "SET_ERROR",
+        payload: "Erreur lors de l'ajout du joueur",
+      });
       // Fallback sur localStorage
       dispatch({ type: "ADD_PLAYER", payload: { name, totalShots } });
     }
@@ -258,8 +273,11 @@ export function ScoringProvider({ children }: { children: React.ReactNode }) {
       dispatch({ type: "REMOVE_PLAYER", payload: { id } });
       dispatch({ type: "SET_LOADING", payload: false });
     } catch (error) {
-      console.error('Erreur lors de la suppression du joueur:', error);
-      dispatch({ type: "SET_ERROR", payload: "Erreur lors de la suppression du joueur" });
+      console.error("Erreur lors de la suppression du joueur:", error);
+      dispatch({
+        type: "SET_ERROR",
+        payload: "Erreur lors de la suppression du joueur",
+      });
       // Fallback sur localStorage
       dispatch({ type: "REMOVE_PLAYER", payload: { id } });
     }
@@ -268,16 +286,19 @@ export function ScoringProvider({ children }: { children: React.ReactNode }) {
   // Ajouter un score avec persistance en base
   const addScoreAsync = async (playerId: string, score: number) => {
     try {
-      const player = state.players.find(p => p.id === playerId);
+      const player = state.players.find((p) => p.id === playerId);
       if (!player) return;
 
       const shotNumber = player.scores.length + 1;
-      
+
       await apiService.addScore(playerId, score, shotNumber);
       dispatch({ type: "ADD_SCORE", payload: { playerId, score } });
     } catch (error) {
-      console.error('Erreur lors de l\'ajout du score:', error);
-      dispatch({ type: "SET_ERROR", payload: "Erreur lors de l'ajout du score" });
+      console.error("Erreur lors de l'ajout du score:", error);
+      dispatch({
+        type: "SET_ERROR",
+        payload: "Erreur lors de l'ajout du score",
+      });
       // Fallback sur localStorage
       dispatch({ type: "ADD_SCORE", payload: { playerId, score } });
     }
@@ -291,8 +312,11 @@ export function ScoringProvider({ children }: { children: React.ReactNode }) {
       dispatch({ type: "RESET_PLAYER_SCORES", payload: { id } });
       dispatch({ type: "SET_LOADING", payload: false });
     } catch (error) {
-      console.error('Erreur lors de la réinitialisation des scores:', error);
-      dispatch({ type: "SET_ERROR", payload: "Erreur lors de la réinitialisation des scores" });
+      console.error("Erreur lors de la réinitialisation des scores:", error);
+      dispatch({
+        type: "SET_ERROR",
+        payload: "Erreur lors de la réinitialisation des scores",
+      });
       // Fallback sur localStorage
       dispatch({ type: "RESET_PLAYER_SCORES", payload: { id } });
     }
@@ -315,14 +339,14 @@ export function ScoringProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const initializeApp = async () => {
       if (isInitialized) return;
-      
+
       try {
         // D'abord essayer de synchroniser depuis localStorage
         await apiService.syncFromLocalStorage();
         // Puis charger les données depuis la base
         await loadPlayersAsync();
       } catch (error) {
-        console.error('Erreur lors de l\'initialisation:', error);
+        console.error("Erreur lors de l'initialisation:", error);
         // Fallback sur localStorage
         loadFromLocalStorage();
       } finally {
@@ -341,15 +365,17 @@ export function ScoringProvider({ children }: { children: React.ReactNode }) {
   }, [state, isInitialized]);
 
   return (
-    <ScoringContext.Provider value={{ 
-      state, 
-      dispatch,
-      addPlayerAsync,
-      removePlayerAsync,
-      addScoreAsync,
-      resetPlayerScoresAsync,
-      loadPlayersAsync
-    }}>
+    <ScoringContext.Provider
+      value={{
+        state,
+        dispatch,
+        addPlayerAsync,
+        removePlayerAsync,
+        addScoreAsync,
+        resetPlayerScoresAsync,
+        loadPlayersAsync,
+      }}
+    >
       {children}
     </ScoringContext.Provider>
   );
