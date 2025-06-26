@@ -45,6 +45,7 @@ export function PlayerManagement() {
     addPlayerAsync,
     removePlayerAsync,
     resetPlayerScoresAsync,
+    loadPlayersAsync,
   } = useScoring();
   const [newPlayerName, setNewPlayerName] = useState("");
   const [newPlayerShots, setNewPlayerShots] = useState(10);
@@ -157,14 +158,13 @@ export function PlayerManagement() {
         opacity: 0,
         duration: 0.3,
         ease: "power2.in",
-        onComplete: async () => {
-          try {
-            await removePlayerAsync(id);
-          } catch (error) {
+        onComplete: () => {
+          // Utilisation d'une fonction non-async pour GSAP
+          removePlayerAsync(id).catch((error) => {
             console.error("Erreur lors de la suppression du joueur:", error);
             // Fallback sur dispatch en cas d'erreur
             dispatch({ type: "REMOVE_PLAYER", payload: { id } });
-          }
+          });
         },
       });
     }
@@ -349,8 +349,70 @@ export function PlayerManagement() {
           <UserPlus className="w-4 h-4 sm:w-5 sm:h-5" />
           Gestion des Tireurs
         </CardTitle>
+
+        {/* Indicateur de statut */}
+        {state.isLoading && (
+          <div className="flex items-center gap-2 text-sm text-blue-600">
+            <div className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+            Chargement...
+          </div>
+        )}
+
+        {state.error && (
+          <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex items-center gap-2 text-sm text-red-800">
+              <span className="font-medium">⚠️ Erreur:</span>
+              <span>{state.error}</span>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                dispatch({ type: "SET_ERROR", payload: null });
+                loadPlayersAsync();
+              }}
+              className="mt-2 text-xs"
+            >
+              Réessayer
+            </Button>
+          </div>
+        )}
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Error Display */}
+        {state.error && (
+          <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex items-center gap-2 text-red-800 text-sm">
+              <span>❌</span>
+              <span className="font-medium">Erreur:</span>
+            </div>
+            <p className="text-red-700 text-sm mt-1">{state.error}</p>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                dispatch({ type: "SET_ERROR", payload: null });
+                // Essayer de recharger les données
+                console.log("🔄 Tentative de rechargement...");
+                window.location.reload();
+              }}
+              className="mt-2 text-xs"
+            >
+              🔄 Réessayer
+            </Button>
+          </div>
+        )}
+
+        {/* Loading State */}
+        {state.isLoading && (
+          <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-center gap-2 text-blue-800 text-sm">
+              <div className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+              <span>Chargement des données...</span>
+            </div>
+          </div>
+        )}
+
         {/* Add New Player */}
         <div className="space-y-2">
           <Input

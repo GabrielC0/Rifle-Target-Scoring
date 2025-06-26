@@ -35,36 +35,11 @@ class ApiService {
 
   // Players API
   async getPlayers(): Promise<Player[]> {
-    try {
-      console.log("🌐 Requête API: GET /api/players");
-      const response = await fetch(`${this.baseUrl}/players`);
-      console.log("📡 Réponse reçue:", {
-        status: response.status,
-        statusText: response.statusText,
-        headers: Object.fromEntries(response.headers.entries()),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("❌ Erreur API:", errorText);
-        throw new Error(`Erreur HTTP ${response.status}: ${errorText}`);
-      }
-
-      const responseText = await response.text();
-      console.log("📄 Contenu brut de la réponse:", responseText);
-
-      if (!responseText.trim()) {
-        console.warn("⚠️ Réponse vide de l'API");
-        return [];
-      }
-
-      const data = JSON.parse(responseText);
-      console.log("✅ Données JSON parsées:", data);
-      return data;
-    } catch (error) {
-      console.error("❌ Erreur dans getPlayers:", error);
-      throw error;
+    const response = await fetch(`${this.baseUrl}/players`);
+    if (!response.ok) {
+      throw new Error("Erreur lors de la récupération des joueurs");
     }
+    return response.json();
   }
 
   async getPlayer(playerId: string): Promise<Player> {
@@ -116,22 +91,6 @@ class ApiService {
     if (!response.ok) {
       throw new Error("Erreur lors de la suppression du joueur");
     }
-  }
-
-  async resetPlayerScores(playerId: string): Promise<Player> {
-    const response = await fetch(`${this.baseUrl}/players/${playerId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ action: "reset-scores" }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Erreur lors de la réinitialisation des scores");
-    }
-
-    return response.json();
   }
 
   // Scores API

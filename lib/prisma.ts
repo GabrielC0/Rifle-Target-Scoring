@@ -29,7 +29,7 @@ export async function checkDatabaseConnection() {
   }
 }
 
-// Fonction pour obtenir les métriques de performance (spécifique à Accelerate)
+// Fonction pour obtenir les métriques de performance
 export async function getDatabaseMetrics() {
   try {
     const startTime = Date.now();
@@ -38,13 +38,13 @@ export async function getDatabaseMetrics() {
     return {
       responseTime,
       status: "connected",
-      accelerate: true,
+      database: "sqlite",
     };
   } catch (error) {
     return {
       responseTime: -1,
       status: "error",
-      accelerate: true,
+      database: "sqlite",
       error: error instanceof Error ? error.message : "Unknown error",
     };
   }

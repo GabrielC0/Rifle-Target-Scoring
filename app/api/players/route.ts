@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
+    console.log("🔄 API /players - Début de la requête GET");
+
     const players = await prisma.player.findMany({
       include: {
         scores: true,
@@ -17,6 +19,8 @@ export async function GET() {
       },
     });
 
+    console.log(`📊 ${players.length} joueurs trouvés dans la base`);
+
     // Calculer les statistiques pour chaque joueur
     const playersWithStats = players.map((player) => {
       const validScores = player.scores || [];
@@ -27,19 +31,29 @@ export async function GET() {
       const shotCount = validScores.length;
       const averageScore = shotCount > 0 ? totalScore / shotCount : 0;
 
-      return {
+      const result = {
         id: player.id,
         name: player.name,
-        totalScore,
+        totalScore: Math.round(totalScore * 100) / 100, // Arrondir à 2 décimales
         averageScore: Number(averageScore.toFixed(2)),
         shotCount,
-        scores: validScores.map((score) => score.value || 0),
+        scores: validScores
+          .sort((a, b) => a.shotNumber - b.shotNumber) // Trier par numéro de tir
+          .map((score) => Number(score.value.toFixed(1))), // Arrondir les scores
         totalShots: 10, // Par défaut
         createdAt: player.createdAt,
         updatedAt: player.updatedAt,
       };
+
+      console.log(
+        `👤 Joueur traité: ${
+          player.name
+        } - ${shotCount} tirs - Score: ${totalScore.toFixed(2)}`
+      );
+      return result;
     });
 
+    console.log("✅ Données à retourner:", playersWithStats);
     return NextResponse.json(playersWithStats);
   } catch (error) {
     console.error("Erreur lors de la récupération des joueurs:", error);

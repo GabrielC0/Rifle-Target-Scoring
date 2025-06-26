@@ -80,3 +80,68 @@ export async function DELETE(
     );
   }
 }
+
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { playerId: string } }
+) {
+  try {
+    const { action } = await request.json();
+
+    if (action === "reset-scores") {
+      console.log(
+        `🔄 Réinitialisation des scores pour le joueur: ${params.playerId}`
+      );
+
+      // Supprimer tous les scores du joueur
+      await prisma.score.deleteMany({
+        where: { playerId: params.playerId },
+      });
+
+      // Récupérer le joueur mis à jour
+      const player = await prisma.player.findUnique({
+        where: { id: params.playerId },
+        include: {
+          scores: {
+            orderBy: {
+              shotNumber: "asc",
+            },
+          },
+        },
+      });
+
+      if (!player) {
+        return NextResponse.json(
+          { error: "Joueur non trouvé" },
+          { status: 404 }
+        );
+      }
+
+      const playerWithStats = {
+        id: player.id,
+        name: player.name,
+        totalScore: 0,
+        averageScore: 0,
+        shotCount: 0,
+        scores: [],
+        totalShots: 10,
+        createdAt: player.createdAt,
+        updatedAt: player.updatedAt,
+      };
+
+      console.log(`✅ Scores réinitialisés pour ${player.name}`);
+      return NextResponse.json(playerWithStats);
+    }
+
+    return NextResponse.json(
+      { error: "Action non supportée" },
+      { status: 400 }
+    );
+  } catch (error: any) {
+    console.error("Erreur lors de la mise à jour du joueur:", error);
+    return NextResponse.json(
+      { error: "Erreur lors de la mise à jour du joueur" },
+      { status: 500 }
+    );
+  }
+}

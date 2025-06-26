@@ -5,6 +5,8 @@ import { gsap } from "gsap";
 import { PlayerManagement } from "@/components/player-management";
 import { GlobalRanking } from "@/components/global-ranking";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function HomePage() {
   const headerRef = useRef<HTMLElement>(null);
@@ -34,8 +36,22 @@ export default function HomePage() {
       <div className="max-w-7xl mx-auto">
         <header ref={headerRef} className="mb-4 sm:mb-6 lg:mb-8">
           <h1 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 text-center px-2">
-            🎯 Système de Score de Tir à la Carabine
+            🎯 Système core
           </h1>
+          <div className="flex justify-center gap-2 mt-4">
+            <a
+              href="/diagnostic"
+              className="text-xs px-3 py-1 bg-blue-100 text-blue-800 rounded-full hover:bg-blue-200 transition-colors"
+            >
+              🔍 Diagnostic
+            </a>
+            <a
+              href="/test"
+              className="text-xs px-3 py-1 bg-green-100 text-green-800 rounded-full hover:bg-green-200 transition-colors"
+            >
+              🧪 Test
+            </a>
+          </div>
         </header>
 
         <div ref={tabsRef}>

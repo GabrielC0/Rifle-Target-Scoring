@@ -19,7 +19,7 @@ import { Target, ArrowLeft, Home } from "lucide-react";
 export default function ShootingPage() {
   const params = useParams();
   const router = useRouter();
-  const { state, dispatch } = useScoring();
+  const { state, dispatch, addScoreAsync } = useScoring();
   const [scoreInput, setScoreInput] = useState("");
   const headerRef = useRef<HTMLDivElement>(null);
   const leftPanelRef = useRef<HTMLDivElement>(null);
@@ -94,7 +94,7 @@ export default function ShootingPage() {
     );
   }
 
-  const handleAddScore = () => {
+  const handleAddScore = async () => {
     if (!scoreInput.trim()) return;
 
     const score = Number.parseFloat(scoreInput);
@@ -112,10 +112,17 @@ export default function ShootingPage() {
       });
     }
 
-    dispatch({
-      type: "ADD_SCORE",
-      payload: { playerId: player.id, score },
-    });
+    try {
+      await addScoreAsync(player.id, score);
+      console.log(`✅ Score ${score} ajouté pour ${player.name}`);
+    } catch (error) {
+      console.error("❌ Erreur lors de l'ajout du score:", error);
+      // Fallback sur dispatch en cas d'erreur
+      dispatch({
+        type: "ADD_SCORE",
+        payload: { playerId: player.id, score },
+      });
+    }
     setScoreInput("");
 
     // Animation de célébration pour les bons scores
@@ -136,7 +143,7 @@ export default function ShootingPage() {
     }
   };
 
-  const handleQuickScore = (score: number) => {
+  const handleQuickScore = async (score: number) => {
     const button = document.querySelector(`[data-quick-score="${score}"]`);
     if (button) {
       gsap.to(button, {
@@ -148,10 +155,17 @@ export default function ShootingPage() {
       });
     }
 
-    dispatch({
-      type: "ADD_SCORE",
-      payload: { playerId: player.id, score },
-    });
+    try {
+      await addScoreAsync(player.id, score);
+      console.log(`✅ Score rapide ${score} ajouté pour ${player.name}`);
+    } catch (error) {
+      console.error("❌ Erreur lors de l'ajout du score rapide:", error);
+      // Fallback sur dispatch en cas d'erreur
+      dispatch({
+        type: "ADD_SCORE",
+        payload: { playerId: player.id, score },
+      });
+    }
 
     // Animation de célébration pour les bons scores
     if (score >= 9) {
@@ -249,10 +263,14 @@ export default function ShootingPage() {
                       className="bg-blue-100 text-blue-800 animate-pulse self-start sm:self-center"
                     >
                       <span className="hidden sm:inline">
-                        Tir {player.currentShot + 1}/{player.totalShots}
+                        {player.currentShot < player.totalShots
+                          ? `${player.currentShot}/${player.totalShots} tirs effectués`
+                          : `Terminé ${player.currentShot}/${player.totalShots}`}
                       </span>
                       <span className="sm:hidden">
-                        {player.currentShot + 1}/{player.totalShots}
+                        {player.currentShot < player.totalShots
+                          ? `${player.currentShot}/${player.totalShots}`
+                          : `${player.currentShot}/${player.totalShots}`}
                       </span>
                     </Badge>
                   </div>
