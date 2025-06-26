@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import { useScoring } from "@/contexts/scoring-context";
 import { SimpleLineChart } from "@/components/simple-charts";
 import {
@@ -17,6 +18,9 @@ import {
   BarChart3,
   TrendingUp,
   Award,
+  Search,
+  CheckSquare,
+  Square,
 } from "lucide-react";
 import { getPlayerColor } from "@/utils/colors";
 
@@ -29,6 +33,7 @@ export function ClassementDashboard({
 }: ClassementDashboardProps) {
   const { state } = useScoring();
   const [selectedPlayers, setSelectedPlayers] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const headerRef = useRef<HTMLDivElement>(null);
   const rankingRef = useRef<HTMLDivElement>(null);
@@ -55,7 +60,7 @@ export function ClassementDashboard({
     }
   }, [preselectedPlayerId, state.players]);
 
-  // Calcul des données de classement
+  // Calcul des données de classement avec filtrage par recherche
   const sortedPlayers = [...state.players]
     .map((player) => {
       const allScores = player.scores || [];
@@ -73,6 +78,9 @@ export function ClassementDashboard({
         allScores,
       };
     })
+    .filter((player) =>
+      player.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
     .sort((a, b) => b.bestScore - a.bestScore);
 
   const handlePlayerToggle = (playerId: string, checked: boolean) => {
@@ -84,6 +92,24 @@ export function ClassementDashboard({
       setSelectedPlayers(selectedPlayers.filter((id) => id !== playerId));
     }
   };
+
+  const handleSelectAll = () => {
+    // Sélectionner seulement les joueurs visibles (filtrés) jusqu'à la limite de 6
+    const visiblePlayerIds = sortedPlayers.slice(0, 6).map((p) => p.id);
+    setSelectedPlayers(visiblePlayerIds);
+  };
+
+  const handleDeselectAll = () => {
+    setSelectedPlayers([]);
+  };
+
+  // Vérifier si tous les joueurs visibles sont sélectionnés
+  const visiblePlayerIds = sortedPlayers.slice(0, 6).map((p) => p.id);
+  const isAllSelected =
+    visiblePlayerIds.length > 0 &&
+    visiblePlayerIds.every((id) => selectedPlayers.includes(id)) &&
+    selectedPlayers.filter((id) => visiblePlayerIds.includes(id)).length ===
+      visiblePlayerIds.length;
 
   const selectedPlayersData = sortedPlayers.filter((p) =>
     selectedPlayers.includes(p.id)
@@ -222,16 +248,89 @@ export function ClassementDashboard({
                 <span className="sm:hidden">Classement</span>
                 <Badge variant="secondary" className="text-xs">
                   {sortedPlayers.length}
+                  {searchTerm
+                    ? ` résultat${sortedPlayers.length > 1 ? "s" : ""}`
+                    : ""}
                 </Badge>
               </CardTitle>
+
+              {/* Contrôles de recherche et sélection */}
+              <div className="space-y-3 pt-3">
+                {/* Barre de recherche */}
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input
+                    placeholder="Rechercher par prénom..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 text-sm"
+                  />
+                </div>
+
+                {/* Boutons de sélection */}
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={
+                      isAllSelected ? handleDeselectAll : handleSelectAll
+                    }
+                    disabled={sortedPlayers.length === 0}
+                    className="flex items-center gap-2 text-xs"
+                  >
+                    {isAllSelected ? (
+                      <>
+                        <Square className="w-3 h-3" />
+                        <span className="hidden sm:inline">
+                          Désélectionner tout
+                        </span>
+                        <span className="sm:hidden">Désél. tout</span>
+                      </>
+                    ) : (
+                      <>
+                        <CheckSquare className="w-3 h-3" />
+                        <span className="hidden sm:inline">
+                          Sélectionner tout
+                        </span>
+                        <span className="sm:hidden">Sél. tout</span>
+                      </>
+                    )}
+                  </Button>
+
+                  {selectedPlayers.length > 0 && (
+                    <Badge variant="secondary" className="text-xs">
+                      {selectedPlayers.length}/6 sélectionnés
+                    </Badge>
+                  )}
+                </div>
+              </div>
             </CardHeader>
             <CardContent className="space-y-2 sm:space-y-3 max-h-[600px] lg:max-h-[800px] overflow-y-auto">
               {sortedPlayers.length === 0 ? (
                 <div className="text-center py-6 sm:py-8 text-gray-500">
-                  <Users className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm sm:text-base">
-                    Aucun tireur enregistré
-                  </p>
+                  {searchTerm ? (
+                    <>
+                      <Search className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-2 opacity-50" />
+                      <p className="text-sm sm:text-base mb-2">
+                        Aucun tireur trouvé pour "{searchTerm}"
+                      </p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSearchTerm("")}
+                        className="text-xs"
+                      >
+                        Effacer la recherche
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Users className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-2 opacity-50" />
+                      <p className="text-sm sm:text-base">
+                        Aucun tireur enregistré
+                      </p>
+                    </>
+                  )}
                 </div>
               ) : (
                 sortedPlayers.map((player, index) => (
