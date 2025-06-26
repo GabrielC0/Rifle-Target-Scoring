@@ -2,11 +2,11 @@
 
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
-import { PlayerManagement } from "@/components/player-management";
+import { ClassementDashboard } from "@/components/classement-dashboard";
 
-export default function HomePage() {
+export default function ClassementPage() {
   const headerRef = useRef<HTMLElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
+  const dashboardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const tl = gsap.timeline();
@@ -18,9 +18,9 @@ export default function HomePage() {
       { y: 0, opacity: 1, duration: 0.8, ease: "power2.out" }
     );
 
-    // Animation d'entrée du contenu
+    // Animation d'entrée du dashboard
     tl.fromTo(
-      contentRef.current,
+      dashboardRef.current,
       { y: 30, opacity: 0 },
       { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" },
       "-=0.4"
@@ -32,14 +32,16 @@ export default function HomePage() {
       <div className="max-w-7xl mx-auto">
         <header ref={headerRef} className="mb-4 sm:mb-6 lg:mb-8">
           <h1 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 text-center px-2">
-            🎯 Système de Tir à la Carabine
+            🏆 Classement et Performances
           </h1>
+          <p className="text-sm sm:text-base text-gray-600 text-center mt-2">
+            Visualisez les classements, sélectionnez des tireurs et comparez
+            leurs statistiques
+          </p>
         </header>
 
-        <div ref={contentRef}>
-          <div className="max-w-4xl mx-auto">
-            <PlayerManagement />
-          </div>
+        <div ref={dashboardRef}>
+          <ClassementDashboard />
         </div>
       </div>
     </div>
