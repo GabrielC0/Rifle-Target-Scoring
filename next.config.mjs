@@ -9,6 +9,18 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-}
+  webpack: (config, { isServer }) => {
+    // Désactiver les warnings de modules en double
+    config.stats = {
+      ...config.stats,
+      warningsFilter: [
+        /multiple modules with names that only differ in casing/i,
+        /There are multiple modules with names that only differ in casing/i,
+      ],
+    };
 
-export default nextConfig
+    return config;
+  },
+};
+
+export default nextConfig;
