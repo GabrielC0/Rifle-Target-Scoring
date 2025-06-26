@@ -19,7 +19,7 @@ export default function RootLayout({
       <body>
         <ScoringProvider>
           <Navigation />
-          <div className="pt-20">{children}</div>
+          <div className="pb-20">{children}</div>
         </ScoringProvider>
       </body>
     </html>

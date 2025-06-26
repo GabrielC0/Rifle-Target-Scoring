@@ -22,9 +22,9 @@ export function Navigation() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
-      <div className="bg-white/90 backdrop-blur-sm border border-gray-200 rounded-full shadow-lg px-2 py-2">
-        <div className="flex items-center space-x-1">
+    <nav className="fixed bottom-2 sm:bottom-4 left-1/2 transform -translate-x-1/2 z-50 w-auto max-w-sm">
+      <div className="bg-white/95 backdrop-blur-md border border-gray-200 rounded-2xl shadow-xl px-1 sm:px-2 py-2">
+        <div className="flex items-center justify-center space-x-1 sm:space-x-2">
           {navigation.map((item) => {
             const isActive = pathname === item.href;
 
@@ -33,14 +33,16 @@ export function Navigation() {
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200",
+                  "flex flex-col sm:flex-row items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 min-w-[60px] sm:min-w-auto",
                   isActive
-                    ? "bg-blue-100 text-blue-700"
+                    ? "bg-blue-100 text-blue-700 shadow-sm"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 )}
               >
-                <item.icon className="w-4 h-4" />
-                <span className="hidden sm:inline">{item.name}</span>
+                <item.icon className="w-4 h-4 sm:w-4 sm:h-4" />
+                <span className="text-[10px] sm:text-sm leading-none sm:leading-normal">
+                  {item.name}
+                </span>
               </Link>
             );
           })}

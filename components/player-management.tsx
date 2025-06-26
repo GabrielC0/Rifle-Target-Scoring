@@ -190,10 +190,6 @@ export function PlayerManagement() {
     }
   };
 
-  const handleUpdateShots = (id: string, totalShots: number) => {
-    dispatch({ type: "UPDATE_PLAYER_SHOTS", payload: { id, totalShots } });
-  };
-
   const handleStartShooting = (playerId: string) => {
     const button = document.querySelector(`[data-start-button="${playerId}"]`);
     if (button) {
@@ -222,7 +218,7 @@ export function PlayerManagement() {
         repeat: 1,
         ease: "power2.inOut",
         onComplete: () => {
-          router.push(`/results/${playerId}`);
+          router.push(`/classement?player=${playerId}`);
         },
       });
     }
@@ -714,41 +710,25 @@ export function PlayerManagement() {
                   </div>
                 </div>
 
-                <div className="flex gap-2">
-                  <Input
-                    type="number"
-                    min="1"
-                    max="50"
-                    value={player.totalShots}
-                    onChange={(e) =>
-                      handleUpdateShots(
-                        player.id,
-                        Number.parseInt(e.target.value) || 10
-                      )
-                    }
-                    className="w-20 h-9 text-sm transition-all duration-200 focus:scale-[1.05]"
-                  />
-
-                  {isCompleted ? (
-                    <Button
-                      onClick={() => handleViewResults(player.id)}
-                      className="flex-1 bg-green-600 hover:bg-green-700 transition-all duration-200 hover:scale-[1.02]"
-                      data-results-button={player.id}
-                    >
-                      <BarChart3 className="w-4 h-4 mr-2" />
-                      Voir les Résultats
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={() => handleStartShooting(player.id)}
-                      className="flex-1 transition-all duration-200 hover:scale-[1.02]"
-                      data-start-button={player.id}
-                    >
-                      <Target className="w-4 h-4 mr-2" />
-                      {player.currentShot > 0 ? "Continuer" : "Démarrer"}
-                    </Button>
-                  )}
-                </div>
+                {isCompleted ? (
+                  <Button
+                    onClick={() => handleViewResults(player.id)}
+                    className="w-full bg-green-600 hover:bg-green-700 transition-all duration-200 hover:scale-[1.02]"
+                    data-results-button={player.id}
+                  >
+                    <BarChart3 className="w-4 h-4 mr-2" />
+                    Voir les Résultats
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => handleStartShooting(player.id)}
+                    className="w-full transition-all duration-200 hover:scale-[1.02]"
+                    data-start-button={player.id}
+                  >
+                    <Target className="w-4 h-4 mr-2" />
+                    {player.currentShot > 0 ? "Continuer" : "Démarrer"}
+                  </Button>
+                )}
 
                 {/* Recent Scores Preview */}
                 {player.scores.length > 0 && (

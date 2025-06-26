@@ -135,10 +135,10 @@ export default function ShootingPage() {
       });
     }
 
-    // Si tous les tirs sont terminés, rediriger vers les résultats
+    // Si tous les tirs sont terminés, rediriger vers la page d'accueil
     if (player.currentShot + 1 >= player.totalShots) {
       setTimeout(() => {
-        router.push(`/results/${player.id}`);
+        router.push("/");
       }, 1000);
     }
   };
@@ -184,10 +184,10 @@ export default function ShootingPage() {
       });
     }
 
-    // Si tous les tirs sont terminés, rediriger vers les résultats
+    // Si tous les tirs sont terminés, rediriger vers la page d'accueil
     if (player.currentShot + 1 >= player.totalShots) {
       setTimeout(() => {
-        router.push(`/results/${player.id}`);
+        router.push("/");
       }, 1000);
     }
   };
@@ -397,7 +397,9 @@ export default function ShootingPage() {
                       Tous les tirs ont été effectués
                     </p>
                     <Button
-                      onClick={() => router.push(`/results/${player.id}`)}
+                      onClick={() =>
+                        router.push(`/classement?player=${player.id}`)
+                      }
                       size="lg"
                       className="transition-all duration-200 hover:scale-105"
                     >

@@ -28,16 +28,19 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-2 sm:p-4 lg:p-6">
+    <div className="min-h-screen bg-gray-50 p-2 sm:p-4 lg:p-6 xl:p-8">
       <div className="max-w-7xl mx-auto">
-        <header ref={headerRef} className="mb-4 sm:mb-6 lg:mb-8">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 text-center px-2">
+        <header ref={headerRef} className="mb-6 sm:mb-8 lg:mb-10 xl:mb-12">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-bold text-gray-900 text-center px-2 sm:px-4 leading-tight">
             🎯 Système de Tir à la Carabine
           </h1>
+          <p className="text-sm sm:text-base lg:text-lg text-gray-600 text-center mt-2 sm:mt-4 px-4">
+            Gérez vos tireurs et suivez leurs performances
+          </p>
         </header>
 
         <div ref={contentRef}>
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-6xl mx-auto">
             <PlayerManagement />
           </div>
         </div>
