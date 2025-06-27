@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, Suspense } from "react";
 import { gsap } from "gsap";
 import { useScoring } from "@/contexts/scoring-context";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,7 @@ import {
 } from "@/components/simple-charts";
 import { Target, ArrowLeft, Home } from "lucide-react";
 
-export default function ShootingPage() {
+function ShootingContent() {
   const params = useParams();
   const router = useRouter();
   const { state, dispatch, addScoreAsync } = useScoring();
@@ -551,5 +551,25 @@ export default function ShootingPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ShootingPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+          <Card className="w-full max-w-md">
+            <CardContent className="text-center py-8">
+              <p className="text-gray-500 mb-4">
+                Chargement de la session de tir...
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      }
+    >
+      <ShootingContent />
+    </Suspense>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, Suspense } from "react";
 import { gsap } from "gsap";
 import { useScoring } from "@/contexts/scoring-context";
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,7 @@ import {
   PrecisionChart,
 } from "@/components/simple-charts";
 
-export default function ResultsPage() {
+function ResultsContent() {
   const params = useParams();
   const router = useRouter();
   const { state, dispatch } = useScoring();
@@ -288,7 +288,7 @@ export default function ResultsPage() {
                 <ChartErrorBoundary>
                   <div className="h-64 sm:h-80">
                     <PrecisionChart
-                      data={evolutionData}
+                      scores={evolutionData.map((d) => d.score)}
                       width={500}
                       height={320}
                     />
@@ -467,5 +467,23 @@ export default function ResultsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ResultsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+          <Card className="w-full max-w-md">
+            <CardContent className="text-center py-8">
+              <p className="text-gray-500 mb-4">Chargement des résultats...</p>
+            </CardContent>
+          </Card>
+        </div>
+      }
+    >
+      <ResultsContent />
+    </Suspense>
   );
 }
