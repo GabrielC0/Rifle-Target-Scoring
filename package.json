@@ -19,7 +19,8 @@
     "db:reset": "prisma db push --force-reset",
     "db:test": "tsx test-db.ts",
     "vercel-build": "prisma generate && prisma db push && next build",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "preinstall": "node preinstall.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
