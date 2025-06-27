@@ -67,8 +67,8 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   return (
     <>
       {children}
-      <Dialog open={showAccessDenied} onOpenChange={setShowAccessDenied}>
-        <DialogContent className="sm:max-w-md">
+      <Dialog open={showAccessDenied} onOpenChange={() => {}}>
+        <DialogContent className="sm:max-w-md [&>button]:hidden">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-red-600">
               <AlertTriangle className="w-5 h-5" />
