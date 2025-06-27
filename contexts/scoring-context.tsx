@@ -229,7 +229,7 @@ function convertDbPlayerToPlayer(dbPlayer: DbPlayer): Player {
   const converted = {
     id: dbPlayer.id,
     name: dbPlayer.name,
-    totalShots: 10, // Valeur par défaut
+    totalShots: dbPlayer.totalShots || 10, // Utiliser la valeur de la DB ou 10 par défaut
     currentShot: dbPlayer.shotCount, // shotCount = nombre de tirs déjà effectués
     scores: sortedScores,
     totalScore: dbPlayer.totalScore,
@@ -299,10 +299,9 @@ export function ScoringProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log(`🎯 Ajout du joueur: ${name} avec ${totalShots} tirs`);
       dispatch({ type: "SET_LOADING", payload: true });
-      const dbPlayer = await apiService.createPlayer(name);
+      const dbPlayer = await apiService.createPlayer(name, totalShots);
       console.log("✅ Joueur créé:", dbPlayer);
       const player = convertDbPlayerToPlayer(dbPlayer);
-      player.totalShots = totalShots;
 
       // Recharger tous les joueurs pour être sûr de la synchronisation
       await loadPlayersAsync();

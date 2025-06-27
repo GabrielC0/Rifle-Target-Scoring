@@ -40,7 +40,7 @@ export async function GET() {
         scores: validScores
           .sort((a, b) => a.shotNumber - b.shotNumber) // Trier par numéro de tir
           .map((score) => Number(score.value.toFixed(1))), // Arrondir les scores
-        totalShots: 10, // Par défaut
+        totalShots: (player as any).totalShots || 10, // Utiliser la valeur de la base
         createdAt: player.createdAt,
         updatedAt: player.updatedAt,
       };
@@ -66,7 +66,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { name } = await request.json();
+    const { name, totalShots } = await request.json();
 
     if (!name || typeof name !== "string") {
       return NextResponse.json(
@@ -75,10 +75,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Valider totalShots
+    const shotsCount =
+      totalShots &&
+      typeof totalShots === "number" &&
+      totalShots >= 1 &&
+      totalShots <= 50
+        ? totalShots
+        : 10;
+
     const player = await prisma.player.create({
       data: {
         name: name.trim(),
-      },
+        totalShots: shotsCount,
+      } as any,
     });
 
     // Retourner le joueur avec les statistiques par défaut
@@ -89,7 +99,7 @@ export async function POST(request: NextRequest) {
       averageScore: 0,
       shotCount: 0,
       scores: [],
-      totalShots: 10,
+      totalShots: (player as any).totalShots,
       createdAt: player.createdAt,
       updatedAt: player.updatedAt,
     };

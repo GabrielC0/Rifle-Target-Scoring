@@ -126,6 +126,7 @@ export function PlayerManagement() {
       try {
         await addPlayerAsync(newPlayerName.trim(), newPlayerShots);
         setNewPlayerName("");
+        setNewPlayerShots(10); // Réinitialiser le nombre de tirs
 
         // Animation du bouton d'ajout
         const addButton = document.querySelector("[data-add-button]");
@@ -146,6 +147,7 @@ export function PlayerManagement() {
           payload: { name: newPlayerName.trim(), totalShots: newPlayerShots },
         });
         setNewPlayerName("");
+        setNewPlayerShots(10); // Réinitialiser le nombre de tirs aussi en cas d'erreur
       }
     }
   };
@@ -418,18 +420,38 @@ export function PlayerManagement() {
             onKeyPress={(e) => e.key === "Enter" && handleAddPlayer()}
             className="text-sm transition-all duration-200 focus:scale-[1.02]"
           />
-          <div className="flex gap-2">
-            <Input
-              type="number"
-              min="1"
-              max="50"
-              value={newPlayerShots}
-              onChange={(e) =>
-                setNewPlayerShots(Number.parseInt(e.target.value) || 10)
-              }
-              className="w-20 text-sm transition-all duration-200 focus:scale-[1.02]"
-              placeholder="Tirs"
-            />
+          <div className="flex gap-2 items-center">
+            <div className="flex flex-col gap-1">
+              <Input
+                type="number"
+                min="1"
+                max="50"
+                value={newPlayerShots}
+                onChange={(e) => {
+                  const value = Number(e.target.value);
+                  // Vérifier que la valeur est un nombre valide entre 1 et 50
+                  if (!isNaN(value) && value >= 1 && value <= 50) {
+                    setNewPlayerShots(value);
+                  } else if (e.target.value === "") {
+                    // Permettre le champ vide temporairement pendant la saisie
+                    setNewPlayerShots(1);
+                  }
+                }}
+                onBlur={(e) => {
+                  // Assurer une valeur valide quand l'utilisateur quitte le champ
+                  const value = Number(e.target.value);
+                  if (isNaN(value) || value < 1) {
+                    setNewPlayerShots(1);
+                  } else if (value > 50) {
+                    setNewPlayerShots(50);
+                  }
+                }}
+                className="w-20 text-sm transition-all duration-200 focus:scale-[1.02]"
+                placeholder="Tirs"
+                title="Nombre de tirs (1-50)"
+              />
+              <span className="text-xs text-gray-500 text-center">Nb tirs</span>
+            </div>
             <Button
               onClick={handleAddPlayer}
               className="flex-1 text-sm transition-all duration-200 hover:scale-[1.02]"

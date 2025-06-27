@@ -32,7 +32,7 @@ export default function HomePage() {
       <div className="max-w-7xl mx-auto">
         <header ref={headerRef} className="mb-6 sm:mb-8 lg:mb-10 xl:mb-12">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-bold text-gray-900 text-center px-2 sm:px-4 leading-tight">
-            🎯 Système de Tir à la Carabine
+            🎯 System Core
           </h1>
           <p className="text-sm sm:text-base lg:text-lg text-gray-600 text-center mt-2 sm:mt-4 px-4">
             Gérez vos tireurs et suivez leurs performances

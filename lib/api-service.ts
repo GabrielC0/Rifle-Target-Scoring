@@ -75,13 +75,13 @@ class ApiService {
     return response.json();
   }
 
-  async createPlayer(name: string): Promise<Player> {
+  async createPlayer(name: string, totalShots?: number): Promise<Player> {
     const response = await fetch(`${this.baseUrl}/players`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ name }),
+      body: JSON.stringify({ name, totalShots }),
     });
 
     if (!response.ok) {
