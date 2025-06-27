@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Home, Trophy, BarChart3, Settings } from "lucide-react";
+import { Home, Trophy, BarChart3, Settings, FlaskConical } from "lucide-react";
 
 const navigation = [
   {
@@ -15,6 +15,11 @@ const navigation = [
     name: "Classement",
     href: "/classement",
     icon: BarChart3,
+  },
+  {
+    name: "Tests",
+    href: "/test",
+    icon: FlaskConical,
   },
 ];
 

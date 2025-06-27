@@ -52,11 +52,14 @@ export async function POST(request: NextRequest) {
 
     // Vérifier qu'on ne dépasse pas le nombre maximum de tirs
     const existingScores = player.scores.length;
-    console.log(`📊 Joueur ${player.name} a déjà ${existingScores} scores`);
+    const maxShots = (player as any).totalShots || 10;
+    console.log(
+      `📊 Joueur ${player.name} a déjà ${existingScores} scores (max: ${maxShots})`
+    );
 
-    if (existingScores >= 10) {
+    if (existingScores >= maxShots) {
       return NextResponse.json(
-        { error: "Le nombre maximum de tirs (10) a été atteint" },
+        { error: `Le nombre maximum de tirs (${maxShots}) a été atteint` },
         { status: 400 }
       );
     }
@@ -116,6 +119,51 @@ export async function DELETE(request: NextRequest) {
     console.error("Erreur lors de la suppression des scores:", error);
     return NextResponse.json(
       { error: "Erreur lors de la suppression des scores" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const playerId = searchParams.get("playerId");
+
+    let whereCondition = {};
+    if (playerId) {
+      whereCondition = { playerId };
+    }
+
+    const scores = await prisma.score.findMany({
+      where: whereCondition,
+      include: {
+        player: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: [{ playerId: "asc" }, { shotNumber: "asc" }],
+    });
+
+    const formattedScores = scores.map((score) => ({
+      id: score.id,
+      playerId: score.playerId,
+      playerName: score.player.name,
+      score: Number(score.value.toFixed(1)),
+      shotNumber: score.shotNumber,
+      x: score.x || null,
+      y: score.y || null,
+      ring: score.ring || null,
+      createdAt: score.timestamp,
+    }));
+
+    return NextResponse.json(formattedScores);
+  } catch (error) {
+    console.error("Erreur lors de la récupération des scores:", error);
+    return NextResponse.json(
+      { error: "Erreur lors de la récupération des scores" },
       { status: 500 }
     );
   }
