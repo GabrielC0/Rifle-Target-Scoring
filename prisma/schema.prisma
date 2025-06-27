@@ -64,6 +64,17 @@ model Score {
   @@map("scores")
 }
 
+model User {
+  id       String @id @default(cuid())
+  username String @unique
+  password String
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("users")
+}
+
 model Settings {
   id    String @id @default("default")
   key   String @unique

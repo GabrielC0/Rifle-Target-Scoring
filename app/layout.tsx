@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ScoringProvider } from "@/contexts/scoring-context";
+import { AuthProvider } from "@/contexts/auth-context";
+import { ProtectedRoute } from "@/components/protected-route";
+import { FloatingAuthButton } from "@/components/floating-auth-button";
 import { Navigation } from "@/components/navigation";
 
 export const metadata: Metadata = {
@@ -17,10 +20,15 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body>
-        <ScoringProvider>
-          <Navigation />
-          <div className="pb-20">{children}</div>
-        </ScoringProvider>
+        <AuthProvider>
+          <ScoringProvider>
+            <ProtectedRoute>
+              <FloatingAuthButton />
+              <Navigation />
+              <div className="pb-20">{children}</div>
+            </ProtectedRoute>
+          </ScoringProvider>
+        </AuthProvider>
       </body>
     </html>
   );
